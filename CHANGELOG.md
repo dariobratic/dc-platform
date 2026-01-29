@@ -6,6 +6,39 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.5] - 2025-01-29
+
+### Added - Access Control Service (Complete)
+- **Domain Layer**
+  - Entities: Role (aggregate root), Permission (child), RoleAssignment
+  - Enum: ScopeType (Organization, Workspace)
+  - Domain Events: RoleCreated, RoleUpdated, RoleDeleted, RoleAssignmentCreated, RoleAssignmentRevoked
+  - Business rules: system role protection, scope matching, duplicate prevention
+
+- **Application Layer**
+  - Commands: CreateRole, UpdateRole, DeleteRole, AssignRole, RevokeRole
+  - Queries: CheckPermission, GetUserPermissions, GetRoleById, GetRolesByScope
+  - Validators: FluentValidation for all commands and queries
+  - MediatR CQRS pattern with ValidationBehavior pipeline
+
+- **Infrastructure Layer**
+  - AccessControlDbContext with domain event dispatching
+  - Entity configurations (EF Core Fluent API)
+  - Repositories: Role, RoleAssignment
+  - PostgreSQL with `access_control` schema
+  - Initial EF Core migration (roles, permissions, role_assignments tables)
+
+- **API Layer**
+  - RolesController (7 endpoints: CRUD + assign/revoke)
+  - PermissionsController (2 endpoints: check + list user permissions)
+  - DTOs for all request/response models
+  - ExceptionHandlingMiddleware (RFC 7807 ProblemDetails)
+
+- **Tests**
+  - Domain tests: 19 tests (Permission, Role, RoleAssignment)
+
+---
+
 ## [0.4] - 2025-01-29
 
 ### Added - Authentication Service
@@ -113,7 +146,7 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Directory | ✅ Complete | 0.2 |
 | Gateway | ✅ Complete | 0.3 |
 | Authentication | ✅ Complete | 0.4 |
-| Access Control | 🔲 Not started | - |
+| Access Control | ✅ Complete | 0.5 |
 | Audit | 🔲 Not started | - |
 | Notification | 🔲 Not started | - |
 | Configuration | 🔲 Not started | - |
