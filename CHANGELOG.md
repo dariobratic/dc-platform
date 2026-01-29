@@ -6,6 +6,25 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.8] - 2025-01-29
+
+### Added - Notification Service
+- .NET 10 Web API project (lightweight, no database, no Clean Architecture layers)
+- Email notification endpoint (`POST /api/v1/notifications/email`) — logs email details (SMTP integration planned)
+- Push notification endpoint (`POST /api/v1/notifications/push`) — placeholder for future implementation
+- Health check endpoint (`GET /api/v1/notifications/health`)
+- `INotificationService` / `NotificationService` with in-memory template engine
+  - Built-in templates: `welcome`, `password-reset`, `invitation`
+  - `{{placeholder}}` replacement with templateData dictionary
+- Request models: `EmailNotificationRequest`, `PushNotificationRequest`, `NotificationResponse`
+- Structured JSON logging via Serilog (console + file sinks)
+- CorrelationIdMiddleware and ExceptionHandlingMiddleware
+- Placeholder SMTP configuration in appsettings.json
+- CLAUDE.md and README.md with service documentation
+- Port: 5005
+
+---
+
 ## [0.7] - 2025-01-29
 
 ### Added - Structured Logging (All Services)
@@ -212,6 +231,6 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Access Control | ✅ Complete | 0.5 |
 | Audit | ✅ Complete | 0.6 |
 | Structured Logging | ✅ All Services | 0.7 |
-| Notification | 🔲 Not started | - |
+| Notification | ✅ Complete | 0.8 |
 | Configuration | 🔲 Not started | - |
 | Admin API | 🔲 Not started | - |
