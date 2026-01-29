@@ -243,6 +243,18 @@ This service acts as a proxy/adapter for Keycloak's OAuth2 endpoints. It does no
 4. **Token Expiration**: Access tokens are short-lived (5 minutes default), refresh tokens are long-lived
 5. **CORS Configuration**: Only allow trusted frontend origins
 
+## Logging
+
+This service uses structured JSON logging via Serilog (see `.claude/skills/structured-logging/SKILL.md`).
+
+- **Log output**: Console (structured text) + File (JSON)
+- **File path**: `infrastructure/logs/authentication/log-{date}.json`
+- **Rotation**: Daily, 30-day retention
+- **Correlation ID**: All requests tagged via `X-Correlation-Id` header
+- **Context enrichment**: RequestMethod, RequestPath, UserId, OrganizationId, WorkspaceId
+
+See the structured-logging skill for log level guidelines and best practices.
+
 ## Commands
 
 ```bash

@@ -1,19 +1,23 @@
+using Authentication.API.Middleware;
 using Authentication.API.Models;
 using Authentication.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig.ReadFrom.Configuration(context.Configuration);
+});
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
-// Register HttpClient for Keycloak communication
 builder.Services.AddHttpClient<IKeycloakService, KeycloakService>();
 
-// JWT authentication for the userinfo endpoint
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -32,7 +36,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// Configure CORS
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
@@ -52,16 +55,26 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
+        diagnosticContext.Set("RequestPath", httpContext.Request.Path.Value);
+
+        var userId = httpContext.User?.FindFirst("sub")?.Value;
+        if (userId != null)
+            diagnosticContext.Set("UserId", userId);
+    };
+});
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Health check endpoint
 app.MapHealthChecks("/health");
-
-// Simple health endpoint with detailed response
 app.MapGet("/api/health", () =>
 {
     return Results.Ok(new HealthResponse

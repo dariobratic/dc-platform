@@ -218,6 +218,18 @@ await _auditClient.CreateAuditEntry(new CreateAuditEntryRequest(
 - PostgreSQL schema: `audit`
 - Migrations history table: `audit.__EFMigrationsHistory`
 
+## Logging
+
+This service uses structured JSON logging via Serilog (see `.claude/skills/structured-logging/SKILL.md`).
+
+- **Log output**: Console (structured text) + File (JSON)
+- **File path**: `infrastructure/logs/audit/log-{date}.json`
+- **Rotation**: Daily, 30-day retention
+- **Correlation ID**: All requests tagged via `X-Correlation-Id` header
+- **Context enrichment**: RequestMethod, RequestPath, UserId, OrganizationId, WorkspaceId
+
+See the structured-logging skill for log level guidelines and best practices.
+
 ## Commands
 
 ```bash

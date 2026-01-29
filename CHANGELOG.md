@@ -6,6 +6,37 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.7] - 2025-01-29
+
+### Added - Structured Logging (All Services)
+- **Serilog Integration** — Added structured JSON logging to all 5 services (Gateway, Authentication, Directory, Access Control, Audit)
+  - Serilog.AspNetCore, Serilog.Sinks.File, Serilog.Expressions packages
+  - Console sink with structured text template
+  - File sink with daily rotation and 30-day retention
+  - Per-service log paths: `infrastructure/logs/{service}/log-{date}.json`
+
+- **CorrelationIdMiddleware** — Distributed tracing via `X-Correlation-Id` header in all services
+  - Auto-generates correlation ID if not provided
+  - Propagates via `Serilog.Context.LogContext`
+
+- **Logging Skill** — Created `.claude/skills/structured-logging/SKILL.md`
+  - Serilog configuration patterns
+  - Log level guidelines (Verbose → Fatal)
+  - Middleware order: CorrelationId → ExceptionHandling → SerilogRequestLogging → CORS → Auth
+  - Context enrichment: RequestMethod, RequestPath, UserId, OrganizationId, WorkspaceId
+
+- **Configuration Updates**
+  - `appsettings.json` — Serilog config with Console + File sinks for each service
+  - `appsettings.Development.json` — Debug-level override for development
+  - CLAUDE.md — Logging section added to all service documentation
+
+### Infrastructure
+- Log directory structure: `infrastructure/logs/{gateway,authentication,directory,access-control,audit}/`
+- `.gitkeep` files to preserve directory structure in git
+- `.gitignore` updated with log file exclusion patterns
+
+---
+
 ## [0.6] - 2025-01-29
 
 ### Added - Audit Service (Complete)
@@ -180,6 +211,7 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Authentication | ✅ Complete | 0.4 |
 | Access Control | ✅ Complete | 0.5 |
 | Audit | ✅ Complete | 0.6 |
+| Structured Logging | ✅ All Services | 0.7 |
 | Notification | 🔲 Not started | - |
 | Configuration | 🔲 Not started | - |
 | Admin API | 🔲 Not started | - |

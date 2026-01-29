@@ -152,6 +152,18 @@ services/directory/
 4. **Events for Side Effects**: Don't call other services directly, publish events
 5. **DTOs at API Boundary**: Never expose domain entities in API responses
 
+## Logging
+
+This service uses structured JSON logging via Serilog (see `.claude/skills/structured-logging/SKILL.md`).
+
+- **Log output**: Console (structured text) + File (JSON)
+- **File path**: `infrastructure/logs/directory/log-{date}.json`
+- **Rotation**: Daily, 30-day retention
+- **Correlation ID**: All requests tagged via `X-Correlation-Id` header
+- **Context enrichment**: RequestMethod, RequestPath, UserId, OrganizationId, WorkspaceId
+
+See the structured-logging skill for log level guidelines and best practices.
+
 ## Commands
 
 ```bash

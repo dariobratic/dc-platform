@@ -1,13 +1,18 @@
+using Gateway.API.Middleware;
 using Gateway.API.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig.ReadFrom.Configuration(context.Configuration);
+});
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
-// Configure CORS
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
@@ -27,15 +32,21 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
+        diagnosticContext.Set("RequestPath", httpContext.Request.Path.Value);
+    };
+});
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Health check endpoint
 app.MapHealthChecks("/health");
-
-// Simple health endpoint with detailed response
 app.MapGet("/api/health", () =>
 {
     return Results.Ok(new HealthResponse
