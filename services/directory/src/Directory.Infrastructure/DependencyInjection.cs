@@ -17,6 +17,9 @@ public static class DependencyInjection
                 npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "directory")));
 
         services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+        services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+        services.AddScoped<IMembershipRepository, MembershipRepository>();
+        services.AddScoped<IInvitationRepository, InvitationRepository>();
 
         return services;
     }
