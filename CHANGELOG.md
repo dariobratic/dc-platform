@@ -6,6 +6,23 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.4] - 2025-01-29
+
+### Added - Authentication Service
+- .NET 10 Web API project (stateless, no database, no Clean Architecture layers)
+- OAuth2 token exchange endpoint (`POST /api/auth/token`) — exchanges authorization code for tokens
+- Token refresh endpoint (`POST /api/auth/refresh`) — refreshes expired access tokens
+- User info endpoint (`GET /api/auth/userinfo`) — returns current user from JWT claims
+- Logout endpoint (`POST /api/auth/logout`) — revokes refresh token in Keycloak (best-effort)
+- Health check endpoints (`/health` and `/api/health`)
+- KeycloakService for HTTP communication with Keycloak token/revoke endpoints
+- JWT Bearer authentication with Keycloak validation
+- CORS configuration (configurable origins via appsettings)
+- Keycloak integration skill (`.claude/skills/keycloak-integration/SKILL.md`)
+- CLAUDE.md and README.md with service documentation
+
+---
+
 ## [0.3] - 2025-01-29
 
 ### Added - Gateway Service
@@ -95,7 +112,7 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 |---------|--------|---------|
 | Directory | ✅ Complete | 0.2 |
 | Gateway | ✅ Complete | 0.3 |
-| Authentication | 🔲 Not started | - |
+| Authentication | ✅ Complete | 0.4 |
 | Access Control | 🔲 Not started | - |
 | Audit | 🔲 Not started | - |
 | Notification | 🔲 Not started | - |
