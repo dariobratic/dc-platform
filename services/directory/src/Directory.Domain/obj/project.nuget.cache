@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "FoMwyeAILqs=",
+  "success": true,
+  "projectFilePath": "C:\\Projects\\dc-platform\\services\\directory\\src\\Directory.Domain\\Directory.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\dario\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

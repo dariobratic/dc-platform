@@ -29,7 +29,7 @@ dc-platform/
 
 ## Tech Stack
 
-### Backend (Default: .NET Core 8+)
+### Backend (Default: .NET Core 10+)
 - Clean Architecture per service (API → Application → Domain → Infrastructure)
 - Entity Framework Core for data access
 - PostgreSQL per service (schema isolation)
