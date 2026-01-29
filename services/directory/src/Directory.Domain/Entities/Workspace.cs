@@ -1,9 +1,10 @@
+using Directory.Domain.Events;
 using Directory.Domain.Exceptions;
 using Directory.Domain.ValueObjects;
 
 namespace Directory.Domain.Entities;
 
-public class Workspace
+public class Workspace : BaseEntity
 {
     public Guid Id { get; private set; }
     public Guid OrganizationId { get; private set; }
@@ -32,7 +33,7 @@ public class Workspace
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Workspace name cannot be empty.");
 
-        return new Workspace
+        var workspace = new Workspace
         {
             Id = Guid.NewGuid(),
             OrganizationId = organizationId,
@@ -41,6 +42,10 @@ public class Workspace
             Status = WorkspaceStatus.Active,
             CreatedAt = DateTime.UtcNow
         };
+
+        workspace.RaiseDomainEvent(new WorkspaceCreated(workspace.Id, organizationId, workspace.Name, slug.Value));
+
+        return workspace;
     }
 
     public void Update(string name)
@@ -50,6 +55,8 @@ public class Workspace
 
         Name = name.Trim();
         UpdatedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(new WorkspaceUpdated(Id, Name));
     }
 
     public void Suspend()
@@ -78,6 +85,8 @@ public class Workspace
         Status = WorkspaceStatus.Deleted;
         DeletedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(new WorkspaceDeleted(Id, OrganizationId));
     }
 
     public Membership AddMember(Guid userId, WorkspaceRole role, Guid? invitedBy = null)
@@ -90,6 +99,9 @@ public class Workspace
 
         var membership = Membership.Create(Id, userId, role, invitedBy);
         _memberships.Add(membership);
+
+        RaiseDomainEvent(new MemberAdded(Id, userId, role));
+
         return membership;
     }
 
@@ -99,5 +111,21 @@ public class Workspace
             ?? throw new DomainException("User is not a member of this workspace.");
 
         _memberships.Remove(membership);
+
+        RaiseDomainEvent(new MemberRemoved(Id, userId));
+    }
+
+    public void ChangeMemberRole(Guid userId, WorkspaceRole newRole)
+    {
+        var membership = _memberships.FirstOrDefault(m => m.UserId == userId)
+            ?? throw new DomainException("User is not a member of this workspace.");
+
+        var oldRole = membership.Role;
+        if (oldRole == newRole)
+            return;
+
+        membership.ChangeRole(newRole);
+
+        RaiseDomainEvent(new MemberRoleChanged(Id, userId, oldRole, newRole));
     }
 }

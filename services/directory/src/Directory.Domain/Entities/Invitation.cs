@@ -1,8 +1,9 @@
+using Directory.Domain.Events;
 using Directory.Domain.Exceptions;
 
 namespace Directory.Domain.Entities;
 
-public class Invitation
+public class Invitation : BaseEntity
 {
     public Guid Id { get; private set; }
     public Guid WorkspaceId { get; private set; }
@@ -32,7 +33,7 @@ public class Invitation
 
         var expiresIn = expiry ?? TimeSpan.FromDays(7);
 
-        return new Invitation
+        var invitation = new Invitation
         {
             Id = Guid.NewGuid(),
             WorkspaceId = workspaceId,
@@ -44,6 +45,10 @@ public class Invitation
             CreatedAt = DateTime.UtcNow,
             InvitedBy = invitedBy
         };
+
+        invitation.RaiseDomainEvent(new InvitationCreated(invitation.Id, workspaceId, invitation.Email, role, invitedBy));
+
+        return invitation;
     }
 
     public void Accept()
@@ -59,6 +64,8 @@ public class Invitation
 
         Status = InvitationStatus.Accepted;
         AcceptedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(new InvitationAccepted(Id, WorkspaceId, Email));
     }
 
     public void Revoke()

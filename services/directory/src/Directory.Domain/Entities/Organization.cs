@@ -1,9 +1,10 @@
+using Directory.Domain.Events;
 using Directory.Domain.Exceptions;
 using Directory.Domain.ValueObjects;
 
 namespace Directory.Domain.Entities;
 
-public class Organization
+public class Organization : BaseEntity
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
@@ -24,7 +25,7 @@ public class Organization
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Organization name cannot be empty.");
 
-        return new Organization
+        var organization = new Organization
         {
             Id = Guid.NewGuid(),
             Name = name.Trim(),
@@ -33,6 +34,10 @@ public class Organization
             Settings = settings ?? OrganizationSettings.Empty(),
             CreatedAt = DateTime.UtcNow
         };
+
+        organization.RaiseDomainEvent(new OrganizationCreated(organization.Id, organization.Name, slug.Value));
+
+        return organization;
     }
 
     public void Update(string name, OrganizationSettings? settings = null)
@@ -46,6 +51,8 @@ public class Organization
             Settings = settings;
 
         UpdatedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(new OrganizationUpdated(Id, Name));
     }
 
     public void Suspend()
@@ -74,5 +81,7 @@ public class Organization
         Status = OrganizationStatus.Deleted;
         DeletedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(new OrganizationDeleted(Id));
     }
 }

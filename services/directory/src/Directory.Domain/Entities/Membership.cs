@@ -34,11 +34,8 @@ public class Membership
         };
     }
 
-    public void ChangeRole(WorkspaceRole newRole)
+    internal void ChangeRole(WorkspaceRole newRole)
     {
-        if (Role == newRole)
-            return;
-
         Role = newRole;
     }
 }
