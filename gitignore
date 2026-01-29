@@ -1,0 +1,63 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.vs/
+
+# .NET
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+*.cache
+*.log
+project.lock.json
+*.nuget.props
+*.nuget.targets
+
+# Node/Frontend
+node_modules/
+dist/
+.output/
+.nuxt/
+.cache/
+*.local
+
+# Environment
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Local.json
+
+# Testing
+coverage/
+TestResults/
+*.trx
+
+# Build
+publish/
+artifacts/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/
+!.claude/CLAUDE.md
+!.claude/agents/
+!.claude/commands/
+!.claude/rules/
+!.claude/skills/
+
+# Docker
+docker-compose.override.yml
+
+# Secrets - NEVER commit
+*.pfx
+*.key
+*.pem
+secrets/
