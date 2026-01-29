@@ -6,6 +6,17 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.3] - 2025-01-29
+
+### Added - Gateway Service
+- .NET 10 Web API project (no database, no Clean Architecture layers)
+- Health check endpoints (`/health` and `/api/health`)
+- CORS configuration (configurable origins via appsettings)
+- Service route configuration for all platform microservices
+- CLAUDE.md with service scope documentation
+
+---
+
 ## [0.2] - 2025-01-29
 
 ### Added - Directory Service (Complete)
@@ -83,7 +94,7 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Service | Status | Version |
 |---------|--------|---------|
 | Directory | ✅ Complete | 0.2 |
-| Gateway | 🔲 Not started | - |
+| Gateway | ✅ Complete | 0.3 |
 | Authentication | 🔲 Not started | - |
 | Access Control | 🔲 Not started | - |
 | Audit | 🔲 Not started | - |
