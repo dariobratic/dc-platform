@@ -1,0 +1,9 @@
+@Gateway.API_HostAddress = http://localhost:5000
+
+### Health Check - Basic
+GET {{Gateway.API_HostAddress}}/health
+
+### Health Check - Detailed
+GET {{Gateway.API_HostAddress}}/api/health
+
+###

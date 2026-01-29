@@ -1,0 +1,137 @@
+# Gateway Service
+
+API Gateway / Backend for Frontend (BFF) for DC Platform.
+
+## Service Scope
+
+### This Service IS Responsible For:
+- Request routing to backend microservices
+- CORS configuration for frontend applications
+- Request/response transformation (future)
+- API versioning and path management
+- Health check aggregation from downstream services
+- Rate limiting and throttling (future)
+- Request/response logging and monitoring (future)
+
+### This Service IS NOT Responsible For:
+- Business logic (→ Domain services)
+- Data persistence (no database)
+- Authentication/authorization logic (→ Authentication Service)
+- User session management (→ Authentication Service)
+
+## Architecture
+
+The Gateway is a **stateless** API Gateway that acts as a single entry point for all client applications. It does not follow Clean Architecture patterns as it has no business logic or domain model.
+
+### Key Characteristics:
+- **No database** - Stateless routing only
+- **No Clean Architecture layers** - Single API project
+- **Minimal middleware** - CORS, routing, health checks
+- **Configuration-driven routing** - Service URLs in appsettings.json
+
+## API Endpoints
+
+### Health & Status
+- `GET /health` - Basic health check (ASP.NET Core standard)
+- `GET /api/health` - Detailed health response with service info
+
+### Future Routing (to be implemented)
+- `/api/v1/directory/*` → Directory Service
+- `/api/v1/auth/*` → Authentication Service
+- `/api/v1/access/*` → Access Control Service
+- `/api/v1/audit/*` → Audit Service
+- `/api/v1/notifications/*` → Notification Service
+- `/api/v1/config/*` → Configuration Service
+
+## Configuration
+
+### CORS Settings (`appsettings.json`)
+```json
+{
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:5173"
+    ]
+  }
+}
+```
+
+### Service Routes (`appsettings.json`)
+```json
+{
+  "ServiceRoutes": {
+    "Directory": "http://localhost:5001",
+    "Authentication": "http://localhost:5002",
+    "AccessControl": "http://localhost:5003",
+    "Audit": "http://localhost:5004",
+    "Notification": "http://localhost:5005",
+    "Configuration": "http://localhost:5006"
+  }
+}
+```
+
+## Project Structure
+
+```
+services/gateway/
+├── src/
+│   └── Gateway.API/            # ASP.NET Core Web API
+│       ├── Models/             # DTOs (health response, etc.)
+│       ├── Properties/         # Launch settings
+│       ├── appsettings.json    # Configuration
+│       ├── Gateway.API.csproj
+│       └── Program.cs
+│
+├── Gateway.slnx
+├── CLAUDE.md                   # This file
+└── README.md
+```
+
+## Technical Requirements
+
+### No Database
+This service is stateless and does not persist any data.
+
+### No Domain Logic
+All business logic resides in downstream services. The Gateway only routes requests.
+
+### Dependencies
+- Microsoft.AspNetCore.OpenApi for API documentation
+- ASP.NET Core Health Checks for monitoring
+
+## Future Features
+
+1. **Request Proxying**: Implement HttpClient-based proxying to downstream services
+2. **Authentication Middleware**: Validate JWT tokens from Authentication service
+3. **Rate Limiting**: Per-user/per-tenant rate limiting
+4. **Circuit Breaker**: Polly-based circuit breaker for downstream service failures
+5. **Request/Response Logging**: Centralized logging for all API calls
+6. **API Versioning**: Support for multiple API versions
+
+## Coding Rules for This Service
+
+1. **Stateless Only**: Never store state in memory or cache
+2. **No Business Logic**: Only routing and transformation
+3. **Configuration-Driven**: Service URLs and settings via appsettings
+4. **Fast Fail**: Return errors immediately, don't retry by default
+5. **Observability**: Log all requests for monitoring and debugging
+
+## Commands
+
+```bash
+# From services/gateway/
+dotnet restore
+dotnet build
+dotnet run --project src/Gateway.API
+
+# Run on specific port
+dotnet run --project src/Gateway.API --urls "http://localhost:5000"
+```
+
+## Development Notes
+
+- Default port: `5000` (HTTP), `5001` (HTTPS)
+- Health endpoint: `http://localhost:5000/api/health`
+- No migrations or database setup required
+- No Clean Architecture setup needed (intentionally simple)
