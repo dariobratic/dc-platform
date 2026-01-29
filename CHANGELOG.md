@@ -6,6 +6,38 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.6] - 2025-01-29
+
+### Added - Audit Service (Complete)
+- **Domain Layer**
+  - Entity: AuditEntry (sealed, immutable aggregate root — no update/delete)
+  - Domain Event: AuditEntryCreated
+  - 14 properties: UserId, Action, EntityType, EntityId, OrganizationId, WorkspaceId, Details (jsonb), IpAddress, UserAgent, ServiceName, CorrelationId, Timestamp, UserEmail
+
+- **Application Layer**
+  - Command: CreateAuditEntry (append-only, no update/delete commands)
+  - Queries: GetAuditEntryById, GetAuditEntries (paginated with 8 filters), GetEntityAuditHistory
+  - Validators: CreateAuditEntryValidator, GetAuditEntriesValidator
+  - PagedResponse generic type for paginated results
+  - MediatR CQRS pattern with ValidationBehavior pipeline
+
+- **Infrastructure Layer**
+  - AuditDbContext with domain event dispatching
+  - Entity configuration with 6 performance indexes (OrganizationId, Timestamp, EntityType+EntityId, UserId, ServiceName, OrganizationId+Timestamp)
+  - Repository: AuditEntry (AddAsync only — no update/delete)
+  - PostgreSQL with `audit` schema
+  - Initial EF Core migration
+
+- **API Layer**
+  - AuditController (4 endpoints: create, get by ID, paginated query, entity history)
+  - No PUT/DELETE endpoints (compliance: immutable log)
+  - ExceptionHandlingMiddleware (RFC 7807 ProblemDetails)
+
+- **Tests**
+  - Domain tests: 15 tests (immutability verification, validation, domain events)
+
+---
+
 ## [0.5] - 2025-01-29
 
 ### Added - Access Control Service (Complete)
@@ -147,7 +179,7 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Gateway | ✅ Complete | 0.3 |
 | Authentication | ✅ Complete | 0.4 |
 | Access Control | ✅ Complete | 0.5 |
-| Audit | 🔲 Not started | - |
+| Audit | ✅ Complete | 0.6 |
 | Notification | 🔲 Not started | - |
 | Configuration | 🔲 Not started | - |
 | Admin API | 🔲 Not started | - |
