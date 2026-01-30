@@ -229,3 +229,76 @@ The problem requires:
 - The change is irreversible or expensive to reverse
 - There are multiple valid approaches and the choice matters
 - Future developers would ask "why did we do it this way?"
+
+## 4. Docker Build Troubleshooting
+
+### Common Build Failures
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `NETSDK1064: Package ... was not found` | `COPY . .` overwrites Docker-restored `obj/project.assets.json` with stale host version | Add `.dockerignore` with `**/bin/`, `**/obj/`, `**/.vs/` to each service |
+| `Microsoft.AspNetCore.OpenApi version mismatch` | Different services reference different patch versions (e.g., 10.0.0 vs 10.0.2) | Align all `Microsoft.AspNetCore.OpenApi` versions to match the SDK in the Docker image |
+| Health check failing / container unhealthy | `curl` not available in `aspnet:10.0` runtime image | Add `RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*` to the `base` stage |
+| Dependent services never start | Service health checks fail, so `depends_on: condition: service_healthy` blocks forever | Fix health check command (install curl) or adjust health check to use a tool available in the image |
+
+### Package Version Rules
+
+All Microsoft packages in .csproj files must use the same patch version that ships with the .NET SDK Docker image:
+
+- `Microsoft.AspNetCore.OpenApi` → must match the SDK version (e.g., `10.0.0`)
+- `Microsoft.EntityFrameworkCore.*` → keep consistent across all services
+- `Microsoft.AspNetCore.Authentication.JwtBearer` → must match the SDK version
+
+Check the SDK version in the Docker image:
+```bash
+docker run --rm mcr.microsoft.com/dotnet/sdk:10.0 dotnet --version
+```
+
+### .dockerignore (Required)
+
+Every service MUST have a `.dockerignore` file to prevent host build artifacts from corrupting Docker builds:
+
+```
+**/bin/
+**/obj/
+**/.vs/
+```
+
+Without this, `COPY . .` in the Dockerfile copies the host's `obj/project.assets.json` (which may reference different package versions than what `dotnet restore` downloaded inside Docker), causing `NETSDK1064` errors during `dotnet publish --no-restore`.
+
+### Dockerfile Health Check Pattern
+
+All service Dockerfiles must install `curl` in the `base` stage for docker-compose health checks:
+
+```dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+WORKDIR /app
+EXPOSE {port}
+ENV ASPNETCORE_URLS=http://+:{port}
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+```
+
+### Quick Docker Debug Commands
+
+```bash
+# Build all services
+cd infrastructure && docker compose build
+
+# Build single service
+docker compose build directory
+
+# View build logs for a specific service
+docker compose build --no-cache gateway 2>&1 | tail -50
+
+# Check container status
+docker compose ps
+
+# View container logs
+docker compose logs -f directory
+
+# Shell into a running container
+docker exec -it dc-platform-directory /bin/bash
+
+# Clean rebuild
+docker compose down -v && docker compose build --no-cache && docker compose up
+```

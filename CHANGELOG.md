@@ -6,6 +6,19 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.25] - 2026-01-30
+
+### Fixed
+- **Docker build failures** — aligned `Microsoft.AspNetCore.OpenApi` to `10.0.0` across all 8 services (was mixed `10.0.0`/`10.0.1`/`10.0.2`)
+- **EF Core Design version mismatch** — aligned `Microsoft.EntityFrameworkCore.Design` to `10.0.0` in Directory.API and AccessControl.API
+- **Docker health checks** — installed `curl` in all Dockerfile `base` stages (`aspnet:10.0` image lacks it), fixing `service_healthy` dependency chain
+- **NETSDK1064 restore/publish mismatch** — added `.dockerignore` to all 8 services excluding `**/bin/`, `**/obj/`, `**/.vs/` to prevent stale host `project.assets.json` from overriding Docker-restored packages
+
+### Changed
+- **Troubleshooting skill** — added Docker Build Troubleshooting section with common failures, package version rules, `.dockerignore` requirements, and debug commands
+
+---
+
 ## [0.24] - 2026-01-30
 
 ### Added
