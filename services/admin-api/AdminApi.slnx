@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="AdminApi.API/AdminApi.API.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="AdminApi.Tests/AdminApi.Tests.csproj" />
+  </Folder>
 </Solution>

@@ -6,6 +6,45 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.14] - 2025-01-30
+
+### Added - Expanded Test Coverage Across Services
+- **AccessControl.API.Tests** — 18 integration tests via Testcontainers PostgreSQL
+  - `RoleEndpointTests` (11 tests): Create (valid, with permissions, empty name, duplicate name in scope), Get (exists, not found), Get by scope, Update (valid, not found), Delete (exists, not found)
+  - `RoleAssignmentEndpointTests` (3 tests): Assign role, duplicate assignment conflict, revoke role
+  - `PermissionEndpointTests` (4 tests): Check permission (has/lacks), get user permissions, empty permissions
+  - Test infrastructure: IntegrationTestFixture with mock IPublisher, IntegrationTestCollection, HttpResponseExtensions
+
+- **Audit.API.Tests** — 14 integration tests via Testcontainers PostgreSQL
+  - `AuditEntryEndpointTests` (14 tests): Create (all fields, required only), validation (empty action, entityType, serviceName), Get by ID (exists, not found), paginated query, filters (organizationId, userId, entityType, serviceName), entity history, immutability (PUT/DELETE return 405)
+  - Test infrastructure: IntegrationTestFixture, IntegrationTestCollection, HttpResponseExtensions
+
+- **AdminApi.Tests** — 17 unit tests with NSubstitute mocks
+  - `AdminControllerTests` (7 tests): Dashboard metrics, system health (all healthy, degraded), organizations list, recent audit, health endpoint, graceful degradation
+  - `DirectoryServiceClientTests` (3 tests): Get organizations, service unavailable fallback, count
+  - `AuditServiceClientTests` (4 tests): Get entries, unavailable fallback, count success, count unavailable
+  - `ServiceHealthCheckerTests` (3 tests): All healthy, one down (degraded), all unreachable
+  - MockHttpMessageHandler for typed HttpClient testing
+
+- **Directory.Application.Tests** — 31 unit tests for CQRS handlers and validators
+  - `CreateOrganizationHandlerTests` (4 tests): Valid creation, with settings, duplicate slug conflict, response mapping
+  - `UpdateOrganizationHandlerTests` (3 tests): Update and save, update with settings, not found
+  - `DeleteOrganizationHandlerTests` (2 tests): Delete sets status, not found
+  - `GetOrganizationByIdHandlerTests` (2 tests): Existing returns response, not found
+  - `CreateOrganizationValidatorTests` (15 tests): Valid command, name validation, slug validation (empty, short, uppercase, spaces, special chars, leading/trailing hyphens)
+  - `UpdateOrganizationValidatorTests` (5 tests): Valid, empty ID, name validation
+
+### Test Coverage Summary
+| Project | Type | Tests | Status |
+|---------|------|-------|--------|
+| AccessControl.API.Tests | Integration (Testcontainers) | 18 | Build ✅ (requires Docker) |
+| Audit.API.Tests | Integration (Testcontainers) | 14 | Build ✅ (requires Docker) |
+| AdminApi.Tests | Unit (NSubstitute) | 17 | Pass ✅ |
+| Directory.Application.Tests | Unit (NSubstitute) | 31 | Pass ✅ |
+| **Total new tests** | | **80** | |
+
+---
+
 ## [0.13] - 2025-01-30
 
 ### Added - Integration Tests & Testing Agent
