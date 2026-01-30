@@ -1,0 +1,25 @@
+{
+  "name": "@dc-platform/shared-types",
+  "version": "0.18.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./src/auth.ts",
+    "./tenant": "./src/tenant.ts",
+    "./api": "./src/api.ts",
+    "./directory": "./src/directory.ts",
+    "./access-control": "./src/access-control.ts",
+    "./audit": "./src/audit.ts",
+    "./notification": "./src/notification.ts",
+    "./configuration": "./src/configuration.ts",
+    "./admin": "./src/admin.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

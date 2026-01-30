@@ -6,6 +6,23 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.19] - 2025-01-30
+
+### Added
+- **Shared types package** (`packages/shared-types`, `@dc-platform/shared-types`) — cross-app TypeScript type definitions matching backend .NET DTOs
+  - `auth.ts` — TokenRequest/Response, UserInfoResponse, AuthState
+  - `tenant.ts` — Organization, Workspace, Membership, Invitation with status/role enums
+  - `api.ts` — PagedResponse\<T\>, ApiError, ApiResult\<T\>
+  - `directory.ts` — Create/Update request and response DTOs for Directory service
+  - `access-control.ts` — Role, RoleAssignment, PermissionCheck, ScopeType
+  - `audit.ts` — AuditEntryResponse, AuditFilter
+  - `notification.ts` — Email and push notification request/response types
+  - `configuration.ts` — ConfigurationResponse, FeatureFlagResponse
+  - `admin.ts` — DashboardResponse, SystemHealthResponse, summaries
+  - Subpath exports for per-module imports (`@dc-platform/shared-types/tenant`, etc.)
+
+---
+
 ## [0.18] - 2025-01-30
 
 ### Added
