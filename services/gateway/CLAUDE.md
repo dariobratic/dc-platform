@@ -35,13 +35,24 @@ The Gateway is a **stateless** API Gateway that acts as a single entry point for
 - `GET /health` - Basic health check (ASP.NET Core standard)
 - `GET /api/health` - Detailed health response with service info
 
-### Future Routing (to be implemented)
-- `/api/v1/directory/*` → Directory Service
-- `/api/v1/auth/*` → Authentication Service
-- `/api/v1/access/*` → Access Control Service
-- `/api/v1/audit/*` → Audit Service
-- `/api/v1/notifications/*` → Notification Service
-- `/api/v1/config/*` → Configuration Service
+### Active Routes (YARP Reverse Proxy)
+
+All routes are configured in `appsettings.json` under the `ReverseProxy` section.
+
+| Route Pattern | Destination Service | Port |
+|---|---|---|
+| `/api/v1/organizations/{**catch-all}` | Directory | 5001 |
+| `/api/v1/workspaces/{**catch-all}` | Directory | 5001 |
+| `/api/v1/memberships/{**catch-all}` | Directory | 5001 |
+| `/api/v1/invitations/{**catch-all}` | Directory | 5001 |
+| `/api/v1/auth/{**catch-all}` | Authentication | 5002 |
+| `/api/v1/roles/{**catch-all}` | Access Control | 5003 |
+| `/api/v1/permissions/{**catch-all}` | Access Control | 5003 |
+| `/api/v1/audit/{**catch-all}` | Audit | 5004 |
+| `/api/v1/notifications/{**catch-all}` | Notification | 5005 |
+| `/api/v1/config/{**catch-all}` | Configuration | 5006 |
+
+YARP automatically forwards incoming requests to the appropriate downstream service based on the path pattern.
 
 ## Configuration
 
@@ -57,19 +68,39 @@ The Gateway is a **stateless** API Gateway that acts as a single entry point for
 }
 ```
 
-### Service Routes (`appsettings.json`)
+### YARP Reverse Proxy Configuration (`appsettings.json`)
+
+YARP routing is configured via the `ReverseProxy` section with two parts:
+
+1. **Routes**: Define path patterns and which cluster to forward to
+2. **Clusters**: Define destination service addresses
+
+Example:
 ```json
 {
-  "ServiceRoutes": {
-    "Directory": "http://localhost:5001",
-    "Authentication": "http://localhost:5002",
-    "AccessControl": "http://localhost:5003",
-    "Audit": "http://localhost:5004",
-    "Notification": "http://localhost:5005",
-    "Configuration": "http://localhost:5006"
+  "ReverseProxy": {
+    "Routes": {
+      "organizations-route": {
+        "ClusterId": "directory",
+        "Match": {
+          "Path": "/api/v1/organizations/{**catch-all}"
+        }
+      }
+    },
+    "Clusters": {
+      "directory": {
+        "Destinations": {
+          "destination1": {
+            "Address": "http://localhost:5001"
+          }
+        }
+      }
+    }
   }
 }
 ```
+
+See the full configuration in `appsettings.json` for all routes and clusters.
 
 ## Project Structure
 
@@ -99,11 +130,11 @@ All business logic resides in downstream services. The Gateway only routes reque
 ### Dependencies
 - Microsoft.AspNetCore.OpenApi for API documentation
 - ASP.NET Core Health Checks for monitoring
+- YARP (Yet Another Reverse Proxy) for request routing to downstream services
 
 ## Future Features
 
-1. **Request Proxying**: Implement HttpClient-based proxying to downstream services
-2. **Authentication Middleware**: Validate JWT tokens from Authentication service
+1. **Authentication Middleware**: Validate JWT tokens from Authentication service
 3. **Rate Limiting**: Per-user/per-tenant rate limiting
 4. **Circuit Breaker**: Polly-based circuit breaker for downstream service failures
 5. **Request/Response Logging**: Centralized logging for all API calls

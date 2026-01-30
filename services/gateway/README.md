@@ -66,19 +66,66 @@ Edit `appsettings.json` to allow frontend origins:
 }
 ```
 
-### Service Routes
+### Reverse Proxy Routing (YARP)
 
-Configure downstream service URLs:
+The Gateway uses YARP (Yet Another Reverse Proxy) to route incoming requests to the appropriate backend microservices.
+
+#### Active Routes
+
+All incoming requests matching these patterns are automatically proxied to the corresponding downstream service:
+
+| Route Pattern | Destination Service | Address |
+|---|---|---|
+| `/api/v1/organizations/{**catch-all}` | Directory | http://localhost:5001 |
+| `/api/v1/workspaces/{**catch-all}` | Directory | http://localhost:5001 |
+| `/api/v1/memberships/{**catch-all}` | Directory | http://localhost:5001 |
+| `/api/v1/invitations/{**catch-all}` | Directory | http://localhost:5001 |
+| `/api/v1/auth/{**catch-all}` | Authentication | http://localhost:5002 |
+| `/api/v1/roles/{**catch-all}` | Access Control | http://localhost:5003 |
+| `/api/v1/permissions/{**catch-all}` | Access Control | http://localhost:5003 |
+| `/api/v1/audit/{**catch-all}` | Audit | http://localhost:5004 |
+| `/api/v1/notifications/{**catch-all}` | Notification | http://localhost:5005 |
+| `/api/v1/config/{**catch-all}` | Configuration | http://localhost:5006 |
+
+#### How It Works
+
+1. Client sends request to Gateway (e.g., `http://localhost:5000/api/v1/organizations`)
+2. YARP matches the path against configured routes
+3. Request is proxied to the destination service (e.g., `http://localhost:5001/api/v1/organizations`)
+4. Response is returned to the client
+
+#### YARP Configuration
+
+Routes and clusters are configured in `appsettings.json` under the `ReverseProxy` section:
 
 ```json
 {
-  "ServiceRoutes": {
-    "Directory": "http://localhost:5001",
-    "Authentication": "http://localhost:5002",
-    "AccessControl": "http://localhost:5003"
+  "ReverseProxy": {
+    "Routes": {
+      "organizations-route": {
+        "ClusterId": "directory",
+        "Match": {
+          "Path": "/api/v1/organizations/{**catch-all}"
+        }
+      }
+    },
+    "Clusters": {
+      "directory": {
+        "Destinations": {
+          "destination1": {
+            "Address": "http://localhost:5001"
+          }
+        }
+      }
+    }
   }
 }
 ```
+
+To add new routes:
+1. Add a new route entry with the path pattern and cluster ID
+2. Add a new cluster entry with the destination service address
+3. Restart the Gateway service
 
 ## Project Structure
 
@@ -101,13 +148,12 @@ This service is intentionally simple:
 - No database or EF Core
 - No Clean Architecture layers
 - No domain logic
-- Configuration-driven routing
+- Configuration-driven routing via YARP
 
 For detailed development guidelines, see [CLAUDE.md](./CLAUDE.md).
 
 ## Future Features
 
-- Request proxying to downstream services
 - JWT token validation
 - Rate limiting and throttling
 - Circuit breaker for resilience

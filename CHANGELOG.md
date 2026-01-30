@@ -6,6 +6,24 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.10] - 2025-01-30
+
+### Added - Gateway Reverse Proxy (YARP)
+- **YARP Integration** — Added `Yarp.ReverseProxy` 2.3.0 to Gateway service
+- **10 proxy routes** configured in appsettings.json, routing all API traffic to downstream services:
+  - `/api/v1/organizations/*`, `/api/v1/workspaces/*`, `/api/v1/memberships/*`, `/api/v1/invitations/*` → Directory (5001)
+  - `/api/v1/auth/*` → Authentication (5002)
+  - `/api/v1/roles/*`, `/api/v1/permissions/*` → Access Control (5003)
+  - `/api/v1/audit/*` → Audit (5004)
+  - `/api/v1/notifications/*` → Notification (5005)
+  - `/api/v1/config/*` → Configuration (5006)
+- **6 YARP clusters** — one per downstream service with destination addresses
+- Gateway health endpoints (`/health`, `/api/health`) remain direct (not proxied)
+- Replaced static `ServiceRoutes` config with YARP `ReverseProxy` section
+- Updated CLAUDE.md and README.md with routing documentation
+
+---
+
 ## [0.9] - 2025-01-30
 
 ### Added - Configuration Service
@@ -247,7 +265,7 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Service | Status | Version |
 |---------|--------|---------|
 | Directory | ✅ Complete | 0.2 |
-| Gateway | ✅ Complete | 0.3 |
+| Gateway | ✅ Complete (YARP) | 0.10 |
 | Authentication | ✅ Complete | 0.4 |
 | Access Control | ✅ Complete | 0.5 |
 | Audit | ✅ Complete | 0.6 |

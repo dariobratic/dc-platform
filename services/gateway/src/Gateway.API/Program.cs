@@ -13,6 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
@@ -56,5 +59,7 @@ app.MapGet("/api/health", () =>
         Timestamp = DateTime.UtcNow
     });
 });
+
+app.MapReverseProxy();
 
 app.Run();
