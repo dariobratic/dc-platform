@@ -6,6 +6,14 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.28] - 2026-01-30
+
+### Added
+- **E2E testing agent** (`.claude/agents/e2e-testing.md`) — Playwright browser automation agent for end-to-end testing with Page Object Model, auth fixtures, multi-browser support, and DC Platform-specific patterns (shell + remote apps, Keycloak auth, tenant context)
+- **Vue testing agent** (`.claude/agents/vue-testing.md`) — Vitest + @vue/test-utils agent for unit and component testing across all 5 frontend projects with mocking patterns, mountPage helper, and store/composable/page testing conventions
+
+---
+
 ## [0.27] - 2026-01-30
 
 ### Added
