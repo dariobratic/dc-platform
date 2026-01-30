@@ -6,6 +6,27 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.9] - 2025-01-30
+
+### Added - Configuration Service
+- .NET 10 Web API project (lightweight single-project, no Clean Architecture layers)
+- Get organization settings endpoint (`GET /api/v1/config/{organizationId}`) — returns key-value settings dictionary
+- Update organization settings endpoint (`PUT /api/v1/config/{organizationId}`) — batch upsert settings
+- Get feature flags endpoint (`GET /api/v1/config/{organizationId}/features`) — returns all feature flags for org
+- Toggle feature flag endpoint (`PUT /api/v1/config/{organizationId}/features/{featureKey}`) — upsert feature flag
+- Health check endpoint (`GET /api/v1/config/health`)
+- Entities: `OrganizationSetting` (key-value pairs), `FeatureFlag` (boolean toggles)
+- EF Core with PostgreSQL, `configuration` schema
+  - Composite unique indexes on (OrganizationId, Key) for both tables
+  - Initial migration included
+- Structured JSON logging via Serilog (console + file sinks)
+- CorrelationIdMiddleware and ExceptionHandlingMiddleware
+- Multi-tenant isolation via organizationId in all queries
+- CLAUDE.md and README.md with service documentation
+- Port: 5006
+
+---
+
 ## [0.8] - 2025-01-29
 
 ### Added - Notification Service
@@ -232,5 +253,5 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Audit | ✅ Complete | 0.6 |
 | Structured Logging | ✅ All Services | 0.7 |
 | Notification | ✅ Complete | 0.8 |
-| Configuration | 🔲 Not started | - |
+| Configuration | ✅ Complete | 0.9 |
 | Admin API | 🔲 Not started | - |
