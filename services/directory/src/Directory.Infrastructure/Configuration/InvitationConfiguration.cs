@@ -11,6 +11,7 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
         builder.ToTable("invitations");
 
         builder.HasKey(i => i.Id);
+        builder.Property(i => i.Id).ValueGeneratedNever();
 
         builder.Property(i => i.Email)
             .IsRequired()

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Directory.API.Middleware;
 using Directory.Application;
 using Directory.Infrastructure;
@@ -10,7 +11,11 @@ builder.Host.UseSerilog((context, loggerConfig) =>
     loggerConfig.ReadFrom.Configuration(context.Configuration);
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();

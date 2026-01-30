@@ -48,7 +48,6 @@ public class WorkspaceRepository : IWorkspaceRepository
 
     public async Task UpdateAsync(Workspace workspace, CancellationToken cancellationToken = default)
     {
-        _context.Workspaces.Update(workspace);
         await _context.SaveChangesAsync(cancellationToken);
     }
 }

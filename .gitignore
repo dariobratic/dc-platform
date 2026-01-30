@@ -40,8 +40,8 @@ dist/
 
 # Logs
 *.log
-infrastructure/logs/**/*.json
-infrastructure/logs/**/*.log
+**/infrastructure/logs/**/*.json
+**/infrastructure/logs/**/*.log
 !infrastructure/logs/**/.gitkeep
 
 # Claude Code

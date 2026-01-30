@@ -26,6 +26,9 @@ public sealed class AddMemberHandler : IRequestHandler<AddMemberCommand, Members
         var workspace = await _workspaceRepository.GetByIdWithMembershipsAsync(request.WorkspaceId, cancellationToken)
             ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
+        if (workspace.Memberships.Any(m => m.UserId == request.UserId))
+            throw new ConflictException("Membership", "UserId", request.UserId);
+
         var membership = workspace.AddMember(request.UserId, request.Role, request.InvitedBy);
 
         await _workspaceRepository.UpdateAsync(workspace, cancellationToken);

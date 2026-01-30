@@ -61,7 +61,6 @@ public class RoleRepository : IRoleRepository
 
     public async Task UpdateAsync(Role role, CancellationToken cancellationToken = default)
     {
-        _context.Roles.Update(role);
         await _context.SaveChangesAsync(cancellationToken);
     }
 

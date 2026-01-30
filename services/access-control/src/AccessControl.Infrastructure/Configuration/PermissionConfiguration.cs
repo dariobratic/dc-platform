@@ -11,6 +11,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
         builder.ToTable("permissions");
 
         builder.HasKey(p => p.Id);
+        builder.Property(p => p.Id).ValueGeneratedNever();
 
         builder.Property(p => p.Action)
             .IsRequired()

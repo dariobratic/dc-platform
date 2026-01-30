@@ -6,6 +6,22 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.16] - 2025-01-30
+
+### Fixed
+- **Serilog ExpressionTemplate** — replaced invalid `@x?.GetType().Name` syntax with `@x` across all 8 service appsettings.json files
+- **Enum JSON serialization** — added `JsonStringEnumConverter` to Directory and AccessControl API to restore string enum responses after .NET 10 default change
+- **EF Core child entity inserts** — added `ValueGeneratedNever()` to Membership, Invitation, and Permission configurations to fix `DbUpdateConcurrencyException` on new child entities
+- **Repository change tracking** — removed redundant `_context.Entity.Update()` calls in WorkspaceRepository and RoleRepository that overrode EF Core Added state
+- **Duplicate member conflict** — added application-level duplicate check in AddMemberHandler returning HTTP 409 instead of 422
+
+### Changed
+- **`/commit` command** — upgraded to parameterless smart workflow: auto-runs unit tests, generates commit message, updates changelog/version, and pushes
+- **Removed `validate-commit.js` hook** — commit format validation now built into `/commit` command
+- **`.gitignore`** — updated log exclusion patterns to catch test-generated log files
+
+---
+
 ## [0.15] - 2025-01-30
 
 ### Added - Root Solution & Housekeeping

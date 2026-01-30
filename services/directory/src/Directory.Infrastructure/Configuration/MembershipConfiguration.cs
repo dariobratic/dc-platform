@@ -11,6 +11,7 @@ public class MembershipConfiguration : IEntityTypeConfiguration<Membership>
         builder.ToTable("memberships");
 
         builder.HasKey(m => m.Id);
+        builder.Property(m => m.Id).ValueGeneratedNever();
 
         builder.Property(m => m.UserId).IsRequired();
 
