@@ -6,6 +6,27 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.26] - 2026-01-30
+
+### Added
+- **Frontend testing infrastructure** — Vitest + @vue/test-utils across all 5 frontend projects (204 tests, 29 test files)
+  - `packages/ui-kit` — 8 component specs (DcButton, DcInput, DcSelect, DcModal, DcAlert, DcBadge, DcCard, DcSpinner) testing variants, sizes, props, emits, slots, disabled/loading states
+  - `packages/api-client` — client factory spec + 7 service specs testing HTTP methods, URLs, interceptors (auth, tenant headers, 401 handling)
+  - `apps/shell` — auth store (14 tests), tenant store (10 tests), router guards (5 tests) with oidc-client-ts and Module Federation mocking
+  - `apps/admin` — useApiClient composable + 5 page specs (Dashboard, Organizations, OrganizationDetail, Roles, AuditLog) with loading/data/error states
+  - `apps/client` — useApiClient composable + 3 page specs (Dashboard, Workspace, Profile) with OIDC sessionStorage bridge testing
+  - Root `vitest.workspace.ts` orchestrating all projects, per-project `vitest.config.ts` with `@vitejs/plugin-vue` (isolated from Module Federation)
+  - `happy-dom` environment for DOM testing, `node` environment for api-client
+  - `mountPage()` test helper pattern with `createTestingPinia()` and component stubs
+- **Health check endpoints** — added `/health` endpoint to Access Control, Audit, Configuration, and Directory services
+- **Gateway routes** — added `/api/v1/users/*` route (Directory) and `/api/v1/admin/*` route (Admin API) with cluster config
+- **Current user organizations endpoint** (`GET /api/v1/memberships/users/me/organizations`) — returns organizations from JWT token `organization_id` claim
+
+### Fixed
+- **Keycloak health check** — changed Docker Compose health check port from 8080 to 9000 (management port) and simplified grep pattern
+
+---
+
 ## [0.25] - 2026-01-30
 
 ### Fixed

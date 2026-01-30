@@ -11,6 +11,11 @@
   "files": [
     "src"
   ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
   "dependencies": {
     "vue": "^3.5.13"
   },

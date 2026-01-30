@@ -10,11 +10,17 @@
     "./services/*": "./src/services/*.ts"
   },
   "files": ["src"],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
   "dependencies": {
     "@dc-platform/shared-types": "workspace:*",
     "axios": "^1.7.9"
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
   }
 }

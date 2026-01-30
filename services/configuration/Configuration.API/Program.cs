@@ -12,6 +12,7 @@ builder.Host.UseSerilog((context, loggerConfig) =>
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
 
 // Register DbContext
 builder.Services.AddDbContext<ConfigurationDbContext>(options =>
@@ -53,5 +54,6 @@ app.UseSerilogRequestLogging(options =>
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

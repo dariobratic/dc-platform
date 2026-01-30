@@ -1,6 +1,10 @@
+using System.Text;
+using System.Text.Json;
 using Directory.API.DTOs;
 using Directory.Application.Commands.Memberships;
 using Directory.Application.Queries.Memberships;
+using Directory.Application.Queries.Organizations;
+using Directory.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +15,12 @@ namespace Directory.API.Controllers;
 public class MembershipsController : ControllerBase
 {
     private readonly ISender _sender;
+    private readonly IOrganizationRepository _organizationRepository;
 
-    public MembershipsController(ISender sender)
+    public MembershipsController(ISender sender, IOrganizationRepository organizationRepository)
     {
         _sender = sender;
+        _organizationRepository = organizationRepository;
     }
 
     [HttpPost("workspaces/{workspaceId:guid}/members")]
@@ -65,5 +71,62 @@ public class MembershipsController : ControllerBase
         var query = new GetUserMembershipsQuery(userId);
         var result = await _sender.Send(query, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpGet("users/me/organizations")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrentUserOrganizations(CancellationToken cancellationToken)
+    {
+        var organizationId = GetOrganizationIdFromToken();
+
+        if (organizationId is null)
+            return Ok(new { organizations = Array.Empty<object>() });
+
+        var organization = await _organizationRepository.GetByIdAsync(organizationId.Value, cancellationToken);
+
+        if (organization is null)
+            return Ok(new { organizations = Array.Empty<object>() });
+
+        var response = OrganizationResponse.FromEntity(organization);
+        return Ok(new { organizations = new[] { response } });
+    }
+
+    private Guid? GetOrganizationIdFromToken()
+    {
+        var authHeader = Request.Headers.Authorization.ToString();
+        if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+            return null;
+
+        var token = authHeader["Bearer ".Length..];
+        var parts = token.Split('.');
+        if (parts.Length < 2)
+            return null;
+
+        var payload = parts[1];
+        payload = payload.Replace('-', '+').Replace('_', '/');
+        switch (payload.Length % 4)
+        {
+            case 2: payload += "=="; break;
+            case 3: payload += "="; break;
+        }
+
+        try
+        {
+            var bytes = Convert.FromBase64String(payload);
+            var json = Encoding.UTF8.GetString(bytes);
+            using var doc = JsonDocument.Parse(json);
+
+            if (doc.RootElement.TryGetProperty("organization_id", out var orgIdProp))
+            {
+                if (Guid.TryParse(orgIdProp.GetString(), out var orgId))
+                    return orgId;
+            }
+        }
+        catch
+        {
+            // Invalid token format — return null
+        }
+
+        return null;
     }
 }
