@@ -119,7 +119,7 @@ services/directory/
 │   ├── Directory.Application.Tests/
 │   └── Directory.Domain.Tests/
 │
-├── Directory.sln
+├── Directory.slnx
 ├── CLAUDE.md                    # This file
 └── README.md
 ```

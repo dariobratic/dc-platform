@@ -6,6 +6,18 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.15] - 2025-01-30
+
+### Added - Root Solution & Housekeeping
+- **Root solution file** (`dc-platform.slnx`) — includes all 25 projects (17 service + 8 test) organized into solution folders by service
+- Solution folders mirror service structure: `services/{name}` for source, `services/{name}/tests` for tests
+
+### Fixed
+- **Docker Compose skill** — Dockerfile template updated from `dotnet:9.0` to `dotnet:10.0` base images
+- **Directory CLAUDE.md** — corrected stale `Directory.sln` reference to `Directory.slnx`
+
+---
+
 ## [0.14] - 2025-01-30
 
 ### Added - Expanded Test Coverage Across Services

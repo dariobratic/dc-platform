@@ -1,0 +1,52 @@
+<Solution>
+  <Folder Name="/services/" />
+  <Folder Name="/services/access-control/">
+    <Project Path="services/access-control/src/AccessControl.API/AccessControl.API.csproj" />
+    <Project Path="services/access-control/src/AccessControl.Application/AccessControl.Application.csproj" />
+    <Project Path="services/access-control/src/AccessControl.Domain/AccessControl.Domain.csproj" />
+    <Project Path="services/access-control/src/AccessControl.Infrastructure/AccessControl.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/services/access-control/tests/">
+    <Project Path="services/access-control/tests/AccessControl.API.Tests/AccessControl.API.Tests.csproj" />
+    <Project Path="services/access-control/tests/AccessControl.Domain.Tests/AccessControl.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/services/admin-api/">
+    <Project Path="services/admin-api/AdminApi.API/AdminApi.API.csproj" />
+  </Folder>
+  <Folder Name="/services/admin-api/tests/">
+    <Project Path="services/admin-api/AdminApi.Tests/AdminApi.Tests.csproj" />
+  </Folder>
+  <Folder Name="/services/audit/">
+    <Project Path="services/audit/src/Audit.API/Audit.API.csproj" />
+    <Project Path="services/audit/src/Audit.Application/Audit.Application.csproj" />
+    <Project Path="services/audit/src/Audit.Domain/Audit.Domain.csproj" />
+    <Project Path="services/audit/src/Audit.Infrastructure/Audit.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/services/audit/tests/">
+    <Project Path="services/audit/tests/Audit.API.Tests/Audit.API.Tests.csproj" />
+    <Project Path="services/audit/tests/Audit.Domain.Tests/Audit.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/services/authentication/">
+    <Project Path="services/authentication/src/Authentication.API/Authentication.API.csproj" />
+  </Folder>
+  <Folder Name="/services/configuration/">
+    <Project Path="services/configuration/Configuration.API/Configuration.API.csproj" />
+  </Folder>
+  <Folder Name="/services/directory/">
+    <Project Path="services/directory/src/Directory.API/Directory.API.csproj" />
+    <Project Path="services/directory/src/Directory.Application/Directory.Application.csproj" />
+    <Project Path="services/directory/src/Directory.Domain/Directory.Domain.csproj" />
+    <Project Path="services/directory/src/Directory.Infrastructure/Directory.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/services/directory/tests/">
+    <Project Path="services/directory/tests/Directory.API.Tests/Directory.API.Tests.csproj" />
+    <Project Path="services/directory/tests/Directory.Application.Tests/Directory.Application.Tests.csproj" />
+    <Project Path="services/directory/tests/Directory.Domain.Tests/Directory.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/services/gateway/">
+    <Project Path="services/gateway/src/Gateway.API/Gateway.API.csproj" />
+  </Folder>
+  <Folder Name="/services/notification/">
+    <Project Path="services/notification/src/Notification.API/Notification.API.csproj" />
+  </Folder>
+</Solution>
