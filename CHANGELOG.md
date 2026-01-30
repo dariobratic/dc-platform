@@ -6,6 +6,21 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.23] - 2025-01-30
+
+### Added
+- **Client microfrontend** (`apps/client`) — Module Federation remote for end-user features
+  - Module Federation remote config exposing `./routes` (port 5174, shared vue/router/pinia)
+  - `DashboardPage` — welcome greeting, quick actions grid, workspace cards, recent activity feed
+  - `WorkspacePage` — single workspace with tabs (overview details, members table with role badges)
+  - `ProfilePage` — OIDC user info display with Keycloak account link for password change
+  - `NotificationsPage` — placeholder for future notification inbox
+  - `InvitationsPage` — placeholder for future invitation management
+  - Shared components: PageHeader, EmptyState, ActivityFeed, QuickActions, WorkspaceCard, InvitationCard
+  - OIDC sessionStorage bridge for user profile data and workspace context awareness
+
+---
+
 ## [0.22] - 2025-01-30
 
 ### Added
