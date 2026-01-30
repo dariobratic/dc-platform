@@ -1,12 +1,12 @@
 ---
+name: python-backend
+description: |
+  Use this agent for Python backend development including:
+  - FastAPI service development
+  - Pydantic models for validation
+  - Async service implementation
+  - Python Dockerfiles and requirements.txt
 model: sonnet
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
 ---
 
 # Python Backend Agent

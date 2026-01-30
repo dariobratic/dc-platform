@@ -1,3 +1,10 @@
+---
+name: keycloak-integration
+description: |
+  Keycloak OAuth2/OIDC integration patterns. Use when implementing authentication,
+  JWT validation, token exchange, or organization context middleware in .NET services.
+---
+
 # Keycloak Integration - DC Platform
 
 ## Architecture: Single Realm with Tenant Isolation

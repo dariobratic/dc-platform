@@ -1,12 +1,14 @@
 ---
+name: dotnet-testing
+description: |
+  Use this agent for all .NET testing tasks including:
+  - Writing unit tests for domain entities and application layer
+  - Writing integration tests with Testcontainers
+  - Setting up test fixtures and test infrastructure
+  - Analyzing test coverage and identifying gaps
+  
+  This agent follows xUnit + FluentAssertions + Testcontainers patterns.
 model: sonnet
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
 ---
 
 # .NET Testing Agent

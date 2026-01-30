@@ -1,3 +1,10 @@
+---
+name: docker-compose
+description: |
+  Docker Compose configuration for DC Platform. Use when adding services to
+  docker-compose.yml, creating Dockerfiles, configuring container networking,
+  health checks, or environment variables.
+---
 # Docker Compose - DC Platform
 
 ## File Location

@@ -1,3 +1,10 @@
+---
+name: troubleshooting
+description: |
+  Debugging and troubleshooting guide. Use when tests fail, cross-service issues
+  occur, or when deciding between bug fix, refactor, or architectural change.
+---
+
 # Troubleshooting & Debugging - DC Platform
 
 ## 1. Test Failure Triage

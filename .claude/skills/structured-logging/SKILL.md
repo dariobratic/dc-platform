@@ -1,3 +1,9 @@
+---
+name: structured-logging
+description: |
+  Serilog structured logging patterns. Use when adding logging to services,
+  configuring log levels, correlation IDs, or setting up log file output.
+---
 # Structured Logging - DC Platform
 
 All DC Platform services use structured JSON logging via Serilog. This ensures consistent, queryable logs across the entire platform.
