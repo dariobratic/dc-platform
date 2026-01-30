@@ -1,0 +1,24 @@
+{
+  "name": "@dc-platform/ui-kit",
+  "version": "0.20.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*.vue"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vue-tsc": "^2.2.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  }
+}

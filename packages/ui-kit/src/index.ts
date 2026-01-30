@@ -1,0 +1,8 @@
+export { default as DcAlert } from './components/DcAlert.vue'
+export { default as DcBadge } from './components/DcBadge.vue'
+export { default as DcButton } from './components/DcButton.vue'
+export { default as DcCard } from './components/DcCard.vue'
+export { default as DcInput } from './components/DcInput.vue'
+export { default as DcModal } from './components/DcModal.vue'
+export { default as DcSelect } from './components/DcSelect.vue'
+export { default as DcSpinner } from './components/DcSpinner.vue'

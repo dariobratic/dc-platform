@@ -6,6 +6,21 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.21] - 2025-01-30
+
+### Added
+- **UI kit package** (`packages/ui-kit`, `@dc-platform/ui-kit`) — shared Vue 3 component library with Tailwind CSS
+  - `DcButton` — primary, secondary, danger, ghost variants with sm/md/lg sizes and loading state
+  - `DcInput` — text input with v-model, label, error/success states, helper text
+  - `DcSelect` — native select with typed options array, validation states
+  - `DcModal` — teleport-based dialog with backdrop, transitions, Escape key, persistent mode
+  - `DcSpinner` — animated SVG loading indicator with sizes and custom color
+  - `DcAlert` — success/error/warning/info alerts with SVG icons, dismissible option
+  - `DcCard` — container with optional header/footer slots
+  - `DcBadge` — status indicator with 5 variants, 2 sizes, optional dot
+
+---
+
 ## [0.20] - 2025-01-30
 
 ### Added
