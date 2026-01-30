@@ -16,7 +16,9 @@
     "lint:shell": "pnpm --filter shell lint",
     "type-check:shell": "pnpm --filter shell type-check",
     "type-check:admin": "pnpm --filter admin type-check",
-    "type-check:client": "pnpm --filter client type-check"
+    "type-check:client": "pnpm --filter client type-check",
+    "build:remotes": "pnpm --filter admin build && pnpm --filter client build",
+    "dev:all": "pnpm --parallel --filter shell --filter admin --filter client dev"
   },
   "engines": {
     "node": ">=20.0.0",

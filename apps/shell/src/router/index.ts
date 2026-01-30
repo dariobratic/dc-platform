@@ -1,7 +1,12 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import type { RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { defineComponent } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
+
+const RemoteRouterView = defineComponent({
+  name: 'RemoteRouterView',
+  template: '<router-view />',
+})
 
 const routes: RouteRecordRaw[] = [
   {
@@ -29,16 +34,30 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, requiresOrganization: true },
   },
   {
-    path: '/admin/:pathMatch(.*)*',
+    path: '/admin',
     name: 'admin',
-    component: () => import('@/pages/AdminPlaceholder.vue'),
+    component: RemoteRouterView,
     meta: { requiresAuth: true, requiresOrganization: true },
+    children: [
+      {
+        path: ':pathMatch(.*)*',
+        name: 'admin-fallback',
+        component: () => import('@/pages/AdminPlaceholder.vue'),
+      },
+    ],
   },
   {
-    path: '/app/:pathMatch(.*)*',
+    path: '/app',
     name: 'client',
-    component: () => import('@/pages/ClientPlaceholder.vue'),
+    component: RemoteRouterView,
     meta: { requiresAuth: true, requiresOrganization: true },
+    children: [
+      {
+        path: ':pathMatch(.*)*',
+        name: 'client-fallback',
+        component: () => import('@/pages/ClientPlaceholder.vue'),
+      },
+    ],
   },
   {
     path: '/',
@@ -53,6 +72,41 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 })
+
+let remotesLoaded = false
+
+export async function loadRemoteRoutes(): Promise<void> {
+  if (remotesLoaded) return
+  remotesLoaded = true
+
+  // Load admin remote routes
+  try {
+    const adminModule = await import('admin/routes')
+    const adminRoutes: RouteRecordRaw[] = adminModule.default
+
+    router.removeRoute('admin-fallback')
+    for (const route of adminRoutes) {
+      router.addRoute('admin', route)
+    }
+    console.log('[Shell] Admin remote routes loaded:', adminRoutes.length)
+  } catch (error) {
+    console.warn('[Shell] Failed to load admin remote:', error)
+  }
+
+  // Load client remote routes
+  try {
+    const clientModule = await import('client/routes')
+    const clientRoutes: RouteRecordRaw[] = clientModule.default
+
+    router.removeRoute('client-fallback')
+    for (const route of clientRoutes) {
+      router.addRoute('client', route)
+    }
+    console.log('[Shell] Client remote routes loaded:', clientRoutes.length)
+  } catch (error) {
+    console.warn('[Shell] Failed to load client remote:', error)
+  }
+}
 
 router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()

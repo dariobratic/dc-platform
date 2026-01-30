@@ -12,7 +12,11 @@ export default defineConfig({
       exposes: {
         './routes': './src/routes.ts',
       },
-      shared: ['vue', 'vue-router', 'pinia'],
+      shared: {
+        vue: { singleton: true },
+        'vue-router': { singleton: true },
+        pinia: { singleton: true },
+      },
     }),
   ],
   resolve: {
@@ -21,6 +25,10 @@ export default defineConfig({
     },
   },
   server: {
+    port: 5173,
+    host: true,
+  },
+  preview: {
     port: 5173,
     host: true,
   },

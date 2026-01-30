@@ -12,7 +12,11 @@ export default defineConfig({
         admin: 'http://localhost:5173/assets/remoteEntry.js',
         client: 'http://localhost:5174/assets/remoteEntry.js',
       },
-      shared: ['vue', 'vue-router', 'pinia'],
+      shared: {
+        vue: { singleton: true },
+        'vue-router': { singleton: true },
+        pinia: { singleton: true },
+      },
     }),
   ],
   resolve: {

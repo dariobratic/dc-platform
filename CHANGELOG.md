@@ -6,6 +6,20 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.24] - 2026-01-30
+
+### Added
+- **Module Federation integration** — shell dynamically loads remote routes from admin and client apps
+  - Shell router loads `admin/routes` and `client/routes` via `@originjs/vite-plugin-federation` at startup
+  - `RemoteRouterView` wrapper component with `<router-view>` for remote route mounting
+  - `loadRemoteRoutes()` in shell main.ts with graceful fallback to placeholder pages if remotes unavailable
+  - TypeScript module declarations for `admin/routes` and `client/routes` federation imports
+  - Singleton shared dependency config (`vue`, `vue-router`, `pinia`) across all three apps to prevent duplicate instances
+  - Preview port config on admin (5173) and client (5174) for federation dev workflow
+  - Root scripts: `build:remotes` (build admin + client), `dev:all` (parallel dev all three apps)
+
+---
+
 ## [0.23] - 2025-01-30
 
 ### Added
