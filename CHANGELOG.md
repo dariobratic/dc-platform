@@ -6,6 +6,29 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.18] - 2025-01-30
+
+### Added
+- **Shell microfrontend app** (`apps/shell`) — Vue 3 host application with Keycloak OIDC, tenant context, and Module Federation
+  - Keycloak PKCE authentication via oidc-client-ts (dc-platform-admin public client)
+  - Post-login organization picker (auto-select single org, picker for multiple)
+  - Axios HTTP client with Bearer token, X-Organization-Id, X-Workspace-Id interceptors
+  - Collapsible sidebar layout, header with org display and user menu
+  - Vue Router with auth guards and organization requirement checks
+  - Module Federation host config for admin (port 5173) and client (port 5174) remotes
+  - Placeholder pages for dashboard, admin module, client module
+- **pnpm monorepo setup** — root package.json and pnpm-workspace.yaml for apps/* and packages/*
+- **Keycloak admin skill** (`.claude/skills/keycloak-admin/SKILL.md`) — realm-export.json configuration, client scopes, protocol mappers, common error fixes, JWT debugging
+
+### Fixed
+- **Keycloak realm-export.json** — added client scope definitions (openid, profile, email, roles, web-origins) and defaultClientScopes to both clients, fixing "Invalid scopes" error
+- **Keycloak integration skill** — updated to cover Vue.js frontend patterns alongside .NET, added cross-reference to keycloak-admin skill
+
+### Changed
+- **`.gitignore`** — removed `**/packages/` NuGet pattern that would conflict with frontend packages/ directory
+
+---
+
 ## [0.17] - 2025-01-30
 
 ### Added

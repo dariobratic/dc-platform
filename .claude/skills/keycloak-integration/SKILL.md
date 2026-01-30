@@ -1,11 +1,14 @@
 ---
 name: keycloak-integration
 description: |
-  Keycloak OAuth2/OIDC integration patterns. Use when implementing authentication,
-  JWT validation, token exchange, or organization context middleware in .NET services.
+  Keycloak OAuth2/OIDC code integration. Use when implementing JWT validation,
+  authentication middleware, token handling, or organization context in .NET or Vue.js
+  applications. For Keycloak server configuration, see keycloak-admin skill.
 ---
 
-# Keycloak Integration - DC Platform
+# Keycloak Integration - Code Patterns
+
+> For Keycloak server configuration (realm-export.json, client scopes, troubleshooting), see `.claude/skills/keycloak-admin/SKILL.md`.
 
 ## Architecture: Single Realm with Tenant Isolation
 
@@ -34,19 +37,16 @@ Frontend flow:
 
 ---
 
-## Keycloak Client Configuration
+## Keycloak Clients
 
-The Gateway service acts as the single OAuth2 client:
+Two clients exist in the `dc-platform` realm:
 
-```
-Client ID:       dc-platform-gateway
-Client Type:     Confidential
-Root URL:        http://localhost:5000
-Valid Redirect:  http://localhost:3000/*, http://localhost:5173/*
-Web Origins:     http://localhost:3000, http://localhost:5173
-```
+| Client | Type | Purpose |
+|--------|------|---------|
+| `dc-platform-gateway` | Confidential | Backend services validate tokens against this audience |
+| `dc-platform-admin` | Public (PKCE S256) | Frontend SPA uses this for login via oidc-client-ts |
 
-Backend services do NOT have their own Keycloak clients — they validate tokens issued to the Gateway client.
+Backend services do NOT have their own Keycloak clients — they validate tokens issued to the Gateway client. For full client configuration details, see the `keycloak-admin` skill.
 
 ---
 
@@ -362,61 +362,97 @@ Fine-grained permissions (workspace roles, resource permissions) are managed by:
 
 ---
 
-## Frontend Integration
+## Frontend Integration (Vue.js Shell App)
 
-### Login Flow
+The shell app (`apps/shell`) handles all auth using `oidc-client-ts` with the `dc-platform-admin` public client (Authorization Code + PKCE).
+
+### UserManager Setup
 
 ```typescript
-// 1. Redirect to Keycloak login
-window.location.href = `${KEYCLOAK_URL}/protocol/openid-connect/auth?` +
-  `client_id=dc-platform-gateway&` +
-  `redirect_uri=${FRONTEND_URL}/callback&` +
-  `response_type=code&` +
-  `scope=openid email profile`;
+// apps/shell/src/plugins/auth.ts
+import { UserManager, WebStorageStateStore } from 'oidc-client-ts'
 
-// 2. Exchange code for token (via Gateway)
-const token = await fetch('/api/auth/token', {
-  method: 'POST',
-  body: JSON.stringify({ code, redirect_uri })
-});
+export const userManager = new UserManager({
+  authority: `${import.meta.env.VITE_KEYCLOAK_URL}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}`,
+  client_id: import.meta.env.VITE_KEYCLOAK_CLIENT_ID, // dc-platform-admin
+  redirect_uri: `${window.location.origin}/callback`,
+  post_logout_redirect_uri: window.location.origin,
+  response_type: 'code',
+  scope: 'openid profile email',
+  userStore: new WebStorageStateStore({ store: sessionStorage }),
+  automaticSilentRenew: true,
+})
+```
 
-// 3. Fetch user's organizations
-const orgs = await fetch('/api/v1/users/me/organizations', {
-  headers: { 'Authorization': `Bearer ${token}` }
-});
+### Auth Store (Pinia)
 
-// 4. User selects organization, store in app state
-setActiveOrganization(orgs[0].id);
+```typescript
+// apps/shell/src/stores/auth.ts
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<User | null>(null)
+  const isAuthenticated = computed(() => !!user.value && !user.value.expired)
+  const accessToken = computed(() => user.value?.access_token ?? null)
 
-// 5. All subsequent requests include header
-fetch('/api/v1/workspaces', {
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'X-Organization-Id': activeOrganizationId
+  async function login() { await userManager.signinRedirect() }
+  async function handleCallback() { user.value = await userManager.signinRedirectCallback() }
+  async function logout() { await userManager.signoutRedirect(); user.value = null }
+  async function getAccessToken(): Promise<string | null> {
+    if (!user.value || user.value.expired) {
+      user.value = await userManager.signinSilent()
+    }
+    return user.value?.access_token ?? null
   }
-});
+
+  return { user, isAuthenticated, accessToken, login, handleCallback, logout, getAccessToken }
+})
 ```
 
-### Organization Switcher Component
+### HTTP Client with Tenant Headers
 
 ```typescript
-// User can switch organization without re-login
-function switchOrganization(newOrgId: string) {
-  setActiveOrganization(newOrgId);
-  // Refresh current view with new org context
-  refetchData();
-}
+// apps/shell/src/plugins/http.ts
+const client = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000',
+})
+
+// Auth header
+client.interceptors.request.use(async (config) => {
+  const token = await authStore.getAccessToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+// Tenant headers
+client.interceptors.request.use((config) => {
+  if (tenantStore.organizationId) config.headers['X-Organization-Id'] = tenantStore.organizationId
+  if (tenantStore.workspaceId) config.headers['X-Workspace-Id'] = tenantStore.workspaceId
+  return config
+})
+
+// 401 handler
+client.interceptors.response.use((r) => r, async (error) => {
+  if (error.response?.status === 401) await authStore.logout()
+  return Promise.reject(error)
+})
 ```
 
----
+### Auth Flow Summary
 
-## Keycloak Realm Setup Checklist
+1. User visits `/` -> router guard redirects to `/login`
+2. `LoginPage` calls `authStore.login()` -> Keycloak redirect (PKCE)
+3. Keycloak authenticates -> redirects to `/callback`
+4. `AuthCallback` calls `authStore.handleCallback()` -> token stored in sessionStorage
+5. Router navigates to `/select-organization`
+6. `OrganizationPickerPage` fetches `GET /api/v1/users/me/organizations`
+7. Single org: auto-select. Multiple: show picker. Zero: show message.
+8. Selected org stored in `useTenantStore()` -> all API calls include `X-Organization-Id`
 
-1. Create realm: `dc-platform`
-2. Create client: `dc-platform-gateway` (confidential)
-3. Configure client redirect URIs and web origins
-4. Create realm roles: `platform-admin`, `user`
-5. Assign default role `user` to new users
-6. Enable email verification (optional)
-7. Configure password policies
-8. Set token lifetimes (access: 5min, refresh: 30min recommended)
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `apps/shell/src/plugins/auth.ts` | oidc-client-ts UserManager setup |
+| `apps/shell/src/stores/auth.ts` | Auth state (Pinia) |
+| `apps/shell/src/stores/tenant.ts` | Org/workspace context (Pinia) |
+| `apps/shell/src/plugins/http.ts` | Axios with auth + tenant interceptors |
+| `apps/shell/src/router/index.ts` | Route guards (requiresAuth, requiresOrganization) |

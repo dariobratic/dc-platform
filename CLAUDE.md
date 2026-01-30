@@ -141,7 +141,8 @@ Each service:
 |-------|------|------|
 | `structured-logging` | `.claude/skills/structured-logging/SKILL.md` | Adding Serilog to a service, configuring log levels, structured log patterns |
 | `docker-compose` | `.claude/skills/docker-compose/SKILL.md` | Adding services to Docker Compose, Dockerfile patterns, container networking |
-| `keycloak-integration` | `.claude/skills/keycloak-integration/SKILL.md` | OAuth2 flows, JWT validation, realm/client configuration |
+| `keycloak-integration` | `.claude/skills/keycloak-integration/SKILL.md` | JWT validation, auth middleware, token handling in .NET/Vue.js code |
+| `keycloak-admin` | `.claude/skills/keycloak-admin/SKILL.md` | realm-export.json, client scopes, auth error fixes, JWT debugging |
 | `troubleshooting` | `.claude/skills/troubleshooting/SKILL.md` | Test failures, cross-service debugging, correlation ID tracing, escalation decisions |
 
 ### Decision Flow

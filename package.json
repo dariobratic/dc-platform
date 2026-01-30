@@ -1,0 +1,17 @@
+{
+  "name": "dc-platform",
+  "version": "0.15.0",
+  "private": true,
+  "description": "Multi-tenant enterprise workflow automation platform",
+  "scripts": {
+    "dev:shell": "pnpm --filter shell dev",
+    "build:shell": "pnpm --filter shell build",
+    "preview:shell": "pnpm --filter shell preview",
+    "lint:shell": "pnpm --filter shell lint",
+    "type-check:shell": "pnpm --filter shell type-check"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

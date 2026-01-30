@@ -6,7 +6,6 @@
 
 # NuGet
 *.nupkg
-**/packages/
 *.nuget.props
 *.nuget.targets
 
