@@ -6,6 +6,24 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.11] - 2025-01-30
+
+### Added - Admin API Service
+- .NET 10 Web API project (lightweight, no database, no Clean Architecture layers)
+- Admin dashboard endpoint (`GET /api/v1/admin/dashboard`) — aggregated stats (org count, audit entry count) fetched in parallel
+- System health endpoint (`GET /api/v1/admin/system/health`) — checks all 7 downstream services in parallel, reports Healthy/Degraded
+- Organizations list endpoint (`GET /api/v1/admin/organizations`) — proxies to Directory service
+- Recent audit endpoint (`GET /api/v1/admin/audit/recent?count=20`) — proxies to Audit service
+- Health check endpoint (`GET /api/v1/admin/health`)
+- **Typed HttpClient services**: `DirectoryServiceClient`, `AuditServiceClient`, `ServiceHealthChecker`
+- Graceful degradation — returns partial data when downstream services are unavailable
+- Structured JSON logging via Serilog (console + file sinks)
+- CorrelationIdMiddleware and ExceptionHandlingMiddleware
+- CLAUDE.md and README.md with service documentation
+- Port: 5007
+
+---
+
 ## [0.10] - 2025-01-30
 
 ### Added - Gateway Reverse Proxy (YARP)
@@ -272,4 +290,4 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 | Structured Logging | ✅ All Services | 0.7 |
 | Notification | ✅ Complete | 0.8 |
 | Configuration | ✅ Complete | 0.9 |
-| Admin API | 🔲 Not started | - |
+| Admin API | ✅ Complete | 0.11 |
