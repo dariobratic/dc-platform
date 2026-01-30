@@ -6,6 +6,24 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.22] - 2025-01-30
+
+### Added
+- **Admin microfrontend** (`apps/admin`) — Module Federation remote for platform administration
+  - Module Federation remote config exposing `./routes` (port 5173, shared vue/router/pinia)
+  - `DashboardPage` — stats overview with org count, audit events, recent activity
+  - `OrganizationsPage` — list, search, create, delete organizations with modal dialogs
+  - `OrganizationDetailPage` — single org view with tabs (overview, workspaces, members)
+  - `WorkspacesPage` — cross-org workspace listing with organization filter
+  - `UsersPage` — user management placeholder (coming soon)
+  - `RolesPage` — role CRUD with permission tag input, system role protection
+  - `AuditLogPage` — searchable audit entries with 6 filters and pagination
+  - Shared components: AdminBreadcrumb, PageHeader, StatsCard, EmptyState, ConfirmDialog, StatusBadge
+  - API client composable with oidc-client-ts token bridge and tenant context
+  - Uses `@dc-platform/ui-kit` for all base UI and `@dc-platform/api-client` for all API calls
+
+---
+
 ## [0.21] - 2025-01-30
 
 ### Added

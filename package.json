@@ -5,10 +5,14 @@
   "description": "Multi-tenant enterprise workflow automation platform",
   "scripts": {
     "dev:shell": "pnpm --filter shell dev",
+    "dev:admin": "pnpm --filter admin dev",
     "build:shell": "pnpm --filter shell build",
+    "build:admin": "pnpm --filter admin build",
     "preview:shell": "pnpm --filter shell preview",
+    "preview:admin": "pnpm --filter admin preview",
     "lint:shell": "pnpm --filter shell lint",
-    "type-check:shell": "pnpm --filter shell type-check"
+    "type-check:shell": "pnpm --filter shell type-check",
+    "type-check:admin": "pnpm --filter admin type-check"
   },
   "engines": {
     "node": ">=20.0.0",
