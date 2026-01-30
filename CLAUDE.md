@@ -124,6 +124,53 @@ Each service:
 - All queries MUST filter by tenant context
 - Never expose data across tenant boundaries
 
+## Decision Making
+
+### Which Agent to Use
+
+| Task | Agent | When |
+|------|-------|------|
+| `dotnet-backend` | .NET service code | Creating/modifying services, controllers, entities, EF Core, CQRS handlers |
+| `dotnet-testing` | .NET test code | Writing unit/integration/E2E tests, test fixtures, Testcontainers setup |
+| `python-backend` | Python service code | FastAPI services, Pydantic models, Python tooling |
+
+### Which Skill to Use
+
+| Skill | File | When |
+|-------|------|------|
+| `structured-logging` | `.claude/skills/structured-logging/SKILL.md` | Adding Serilog to a service, configuring log levels, structured log patterns |
+| `docker-compose` | `.claude/skills/docker-compose/SKILL.md` | Adding services to Docker Compose, Dockerfile patterns, container networking |
+| `keycloak-integration` | `.claude/skills/keycloak-integration/SKILL.md` | OAuth2 flows, JWT validation, realm/client configuration |
+| `troubleshooting` | `.claude/skills/troubleshooting/SKILL.md` | Test failures, cross-service debugging, correlation ID tracing, escalation decisions |
+
+### Decision Flow
+
+```
+Problem identified
+  │
+  ├─ Test failure? → Follow troubleshooting skill (Step 1→2→3 triage)
+  │
+  ├─ New feature in existing service? → Use dotnet-backend agent
+  │     └─ Then write tests → Use dotnet-testing agent
+  │
+  ├─ New service? → Use dotnet-backend agent + docker-compose skill
+  │
+  ├─ Cross-service issue? → Follow troubleshooting skill (cross-service debugging)
+  │
+  ├─ Affects one service only? → Bug fix or refactor, just do it
+  │
+  └─ Affects multiple services or architecture? → Create ADR in docs/adr/
+```
+
+### When NOT to Decide Alone
+
+Escalate (ask the user or create an ADR) when:
+- Changing service boundaries or API contracts
+- Adding new infrastructure components (Redis, RabbitMQ)
+- Modifying authentication/authorization flows
+- Any breaking change to existing APIs
+- Introducing cross-service synchronous dependencies
+
 ## Commands
 
 ```bash
