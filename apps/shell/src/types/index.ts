@@ -31,3 +31,11 @@ export interface ApiError {
 export interface OrganizationsResponse {
   organizations: Organization[]
 }
+
+export interface SignupFormData {
+  fullName: string
+  email: string
+  password: string
+  confirmPassword: string
+  organizationName: string
+}

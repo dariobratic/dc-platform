@@ -27,6 +27,29 @@ export interface UserInfoResponse {
   preferredUsername: string
 }
 
+export interface SignupRequest {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  organizationName: string
+}
+
+export interface SigninRequest {
+  email: string
+  password: string
+}
+
+export interface SignupResponse {
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+  tokenType: string
+  userId: string
+  organizationId: string
+  workspaceId: string
+}
+
 // Frontend-only auth types (not from backend)
 export interface AuthState {
   isAuthenticated: boolean

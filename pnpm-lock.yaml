@@ -130,6 +130,12 @@ importers:
 
   apps/shell:
     dependencies:
+      '@dc-platform/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      '@dc-platform/ui-kit':
+        specifier: workspace:*
+        version: link:../../packages/ui-kit
       axios:
         specifier: ^1.7.9
         version: 1.13.4

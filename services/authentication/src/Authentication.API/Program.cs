@@ -17,6 +17,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 
 builder.Services.AddHttpClient<IKeycloakService, KeycloakService>();
+builder.Services.AddHttpClient<IDirectoryService, DirectoryService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:DirectoryUrl"]
+        ?? throw new InvalidOperationException("Services:DirectoryUrl not configured"));
+});
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

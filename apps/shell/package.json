@@ -18,7 +18,9 @@
     "vue-router": "^4.5.0",
     "pinia": "^2.3.0",
     "axios": "^1.7.9",
-    "oidc-client-ts": "^3.2.1"
+    "oidc-client-ts": "^3.2.1",
+    "@dc-platform/ui-kit": "workspace:*",
+    "@dc-platform/shared-types": "workspace:*"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",

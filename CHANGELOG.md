@@ -6,6 +6,25 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.27] - 2026-01-30
+
+### Added
+- **Custom signup and signin flow** — Replace Keycloak hosted login pages with custom forms
+  - `POST /api/v1/auth/signin` — ROPC authentication with email/password via `dc-platform-admin` public client
+  - `POST /api/v1/auth/signup` — Full orchestration: create Keycloak user, ROPC login, create org + workspace + membership via Directory, update user attributes, return fresh tokens
+  - Auth service `DirectoryService` — HTTP client calling Directory at configurable `Services:DirectoryUrl` (avoids gateway circular dependency)
+  - Auth service `KeycloakService` — `CreateUserAsync`, `AuthenticateWithPasswordAsync`, `UpdateUserAttributesAsync` with service account admin token
+  - Auth route changed from `api/auth` to `api/v1/auth` to align with Gateway YARP pattern
+  - Keycloak `dc-platform-admin` client: enabled ROPC (`directAccessGrantsEnabled`), added `tenant-id`, `organization-id`, `realm-roles` protocol mappers
+  - Shell `LoginPage.vue` — Custom email/password form with error handling (401, 429)
+  - Shell `SignupPage.vue` — Registration form with client-side validation, org slug preview, tenant context auto-setup
+  - Shell auth store — `storeCustomTokens` (oidc-client-ts sessionStorage compatibility), `loginWithCredentials`, `signupUser`
+  - Shell router guard — redirects to `/login` page instead of Keycloak hosted login
+  - Shared types: `SignupRequest`, `SigninRequest`, `SignupResponse`; api-client: `signup()`, `signin()` functions
+  - All existing api-client auth paths updated from `/api/auth/*` to `/api/v1/auth/*`
+
+---
+
 ## [0.26] - 2026-01-30
 
 ### Added

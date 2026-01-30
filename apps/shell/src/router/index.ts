@@ -16,6 +16,12 @@ const routes: RouteRecordRaw[] = [
     meta: { layout: 'auth' },
   },
   {
+    path: '/signup',
+    name: 'signup',
+    component: () => import('@/pages/SignupPage.vue'),
+    meta: { layout: 'auth' },
+  },
+  {
     path: '/callback',
     name: 'callback',
     component: () => import('@/pages/AuthCallback.vue'),
@@ -112,7 +118,7 @@ router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()
   const tenantStore = useTenantStore()
 
-  if (!authStore.user && to.name !== 'login' && to.name !== 'callback') {
+  if (!authStore.user && to.name !== 'login' && to.name !== 'callback' && to.name !== 'signup') {
     await authStore.initialize()
   }
 
@@ -123,8 +129,7 @@ router.beforeEach(async (to, _from, next) => {
     if (to.path !== '/login') {
       sessionStorage.setItem('intendedRoute', to.fullPath)
     }
-    await authStore.login()
-    return next(false)
+    return next('/login')
   }
 
   if (requiresOrganization && !tenantStore.hasOrganization) {

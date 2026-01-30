@@ -9,6 +9,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
       'admin/routes': resolve(__dirname, 'test/mocks/admin-routes.ts'),
       'client/routes': resolve(__dirname, 'test/mocks/client-routes.ts'),
+      '@dc-platform/ui-kit': resolve(__dirname, 'test/mocks/ui-kit.ts'),
     },
   },
   test: {

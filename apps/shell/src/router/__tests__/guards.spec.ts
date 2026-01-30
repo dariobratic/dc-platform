@@ -44,11 +44,10 @@ describe('router guards', () => {
 
   it('redirects to login when accessing auth-required route unauthenticated', async () => {
     mockUserManager.getUser.mockResolvedValue(null)
-    mockUserManager.signinRedirect.mockResolvedValue(undefined)
 
     await router.push('/dashboard')
 
-    expect(mockUserManager.signinRedirect).toHaveBeenCalled()
+    expect(router.currentRoute.value.path).toBe('/login')
   })
 
   it('redirects to select-organization when no org set', async () => {
@@ -58,8 +57,7 @@ describe('router guards', () => {
     const authStore = useAuthStore()
     authStore.user = { expired: false, access_token: 'token', profile: {} } as any
 
-    const tenantStore = useTenantStore()
-    // No organization set
+    // No organization set — tenantStore has no org by default
 
     await router.push('/dashboard')
 
@@ -79,5 +77,10 @@ describe('router guards', () => {
     await router.push('/dashboard')
 
     expect(router.currentRoute.value.path).toBe('/dashboard')
+  })
+
+  it('allows navigation to signup without auth', async () => {
+    await router.push('/signup')
+    expect(router.currentRoute.value.name).toBe('signup')
   })
 })
