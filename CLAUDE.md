@@ -106,7 +106,7 @@ Each service:
 - Composition API with `<script setup>`
 - TypeScript for all components
 - Props validation required
-- English for code, Serbian for user-facing strings
+- English for all code and UI strings (i18n/l10n added later)
 
 ## What Claude Should NOT Do
 
@@ -132,6 +132,7 @@ Each service:
 |------|-------|------|
 | `dotnet-backend` | .NET service code | Creating/modifying services, controllers, entities, EF Core, CQRS handlers |
 | `dotnet-testing` | .NET test code | Writing unit/integration/E2E tests, test fixtures, Testcontainers setup |
+| `vue-frontend` | Vue.js frontend code | Vue 3 components, composables, Tailwind CSS, microfrontend apps, API client, i18n |
 | `python-backend` | Python service code | FastAPI services, Pydantic models, Python tooling |
 
 ### Which Skill to Use
@@ -149,6 +150,8 @@ Each service:
 Problem identified
   │
   ├─ Test failure? → Follow troubleshooting skill (Step 1→2→3 triage)
+  │
+  ├─ Frontend work (apps/, packages/)? → Use vue-frontend agent
   │
   ├─ New feature in existing service? → Use dotnet-backend agent
   │     └─ Then write tests → Use dotnet-testing agent

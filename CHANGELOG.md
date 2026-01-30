@@ -6,6 +6,22 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.17] - 2025-01-30
+
+### Added
+- **Vue.js Frontend Agent** (`.claude/agents/vue-frontend.md`) — development agent for Vue 3 microfrontend apps
+  - Vue 3 Composition API with `<script setup>`, TypeScript strict mode, Tailwind CSS
+  - Microfrontend architecture patterns (Module Federation via vite-plugin-federation)
+  - Project structure: apps/shell (host), apps/admin, apps/client (remotes), packages/ui-kit
+  - API integration patterns with Gateway (port 5000), typed Axios client with interceptors
+  - Keycloak OIDC authentication (PKCE flow, oidc-client-ts, auth store)
+  - Tenant context via X-Organization-Id / X-Workspace-Id headers
+  - Pinia state management, vue-router with auth guards
+  - Coding rules, component/composable patterns, environment variables
+- **CLAUDE.md** — added `vue-frontend` agent to decision table and decision flow
+
+---
+
 ## [0.16] - 2025-01-30
 
 ### Fixed
