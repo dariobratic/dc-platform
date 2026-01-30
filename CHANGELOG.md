@@ -6,6 +6,32 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.13] - 2025-01-30
+
+### Added - Integration Tests & Testing Agent
+- **Testing Agent** (`.claude/agents/dotnet-testing.md`)
+  - xUnit + FluentAssertions + NSubstitute + Testcontainers stack
+  - Test categories: Unit, Integration, E2E
+  - Naming convention: `MethodName_Scenario_ExpectedResult`
+  - WebApplicationFactory + Testcontainers fixture patterns
+  - Assertion and NSubstitute patterns reference
+
+- **Directory Integration Tests** — 36 tests via real PostgreSQL 17 (Testcontainers)
+  - `OrganizationEndpointTests` (11 tests): Create (valid, settings, duplicate slug, empty name, invalid slug), Get (exists, not found), Update (valid, settings, not found), Delete (exists, verify soft delete, not found)
+  - `WorkspaceEndpointTests` (9 tests): Create (valid, duplicate slug same org, same slug different orgs), Get (exists, not found), List, Update, Delete (exists, verify soft delete)
+  - `MembershipEndpointTests` (11 tests): Add (valid, owner role, duplicate), List, Change role (Admin, Owner), Remove (exists, verify removal), User memberships across workspaces, full add→change→remove E2E flow
+  - **No InMemory provider** — all tests use real PostgreSQL via Testcontainers
+  - Shared container per xUnit collection for performance
+
+- **Test Infrastructure**
+  - `IntegrationTestFixture` — PostgreSQL container + WebApplicationFactory + auto-migration
+  - `IntegrationTestCollection` — xUnit shared fixture collection
+  - `HttpResponseExtensions` — `ReadAsAsync<T>()` deserialization helper
+  - `Testcontainers.PostgreSql` 4.4.0 added to test project
+  - `InternalsVisibleTo` on Directory.API for Program class access
+
+---
+
 ## [0.12] - 2025-01-30
 
 ### Added - Docker Compose Infrastructure
