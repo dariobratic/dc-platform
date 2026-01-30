@@ -6,6 +6,22 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.20] - 2025-01-30
+
+### Added
+- **API client package** (`packages/api-client`, `@dc-platform/api-client`) — typed HTTP client for all backend microservices
+  - Axios-based client factory with Bearer token, tenant context headers, and 401 handling interceptors
+  - `services/directory.ts` — 18 functions for organizations, workspaces, memberships, invitations
+  - `services/access-control.ts` — 9 functions for roles, role assignments, permission checks
+  - `services/audit.ts` — 4 functions for audit entries and entity history queries
+  - `services/auth.ts` — 4 functions for token exchange, refresh, userinfo, logout
+  - `services/notification.ts` — 2 functions for email and push notifications
+  - `services/configuration.ts` — 4 functions for org settings and feature flags
+  - `services/admin.ts` — 4 functions for dashboard, system health, summaries
+  - Subpath exports for per-service imports (`@dc-platform/api-client/services/*`)
+
+---
+
 ## [0.19] - 2025-01-30
 
 ### Added

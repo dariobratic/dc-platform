@@ -54,6 +54,19 @@ importers:
         specifier: ^2.2.0
         version: 2.2.12(typescript@5.9.3)
 
+  packages/api-client:
+    dependencies:
+      '@dc-platform/shared-types':
+        specifier: workspace:*
+        version: link:../shared-types
+      axios:
+        specifier: ^1.7.9
+        version: 1.13.4
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
   packages/shared-types:
     devDependencies:
       typescript:
