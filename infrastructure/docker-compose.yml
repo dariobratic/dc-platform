@@ -1,0 +1,260 @@
+services:
+  # --- Infrastructure ---
+
+  postgres:
+    image: postgres:17
+    container_name: dc-platform-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - dc-platform
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    container_name: dc-platform-keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_SCHEMA: keycloak
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_PORT: "8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/dc-platform-realm.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && cat <&3 | grep -q '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    networks:
+      - dc-platform
+
+  # --- Application Services ---
+
+  gateway:
+    build:
+      context: ../services/gateway
+      dockerfile: Dockerfile
+    container_name: dc-platform-gateway
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ReverseProxy__Clusters__directory__Destinations__destination1__Address: http://directory:5001
+      ReverseProxy__Clusters__authentication__Destinations__destination1__Address: http://authentication:5002
+      ReverseProxy__Clusters__access-control__Destinations__destination1__Address: http://access-control:5003
+      ReverseProxy__Clusters__audit__Destinations__destination1__Address: http://audit:5004
+      ReverseProxy__Clusters__notification__Destinations__destination1__Address: http://notification:5005
+      ReverseProxy__Clusters__configuration__Destinations__destination1__Address: http://configuration:5006
+    ports:
+      - "5000:5000"
+    depends_on:
+      directory:
+        condition: service_healthy
+      authentication:
+        condition: service_healthy
+      access-control:
+        condition: service_healthy
+      audit:
+        condition: service_healthy
+      notification:
+        condition: service_healthy
+      configuration:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+  directory:
+    build:
+      context: ../services/directory
+      dockerfile: Dockerfile
+    container_name: dc-platform-directory
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DirectoryDb: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Search Path=directory
+    ports:
+      - "5001:5001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+  authentication:
+    build:
+      context: ../services/authentication
+      dockerfile: Dockerfile
+    container_name: dc-platform-authentication
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Keycloak__Authority: http://keycloak:8080/realms/dc-platform
+      Keycloak__ClientId: ${KEYCLOAK_CLIENT_ID}
+      Keycloak__ClientSecret: ${KEYCLOAK_CLIENT_SECRET}
+    ports:
+      - "5002:5002"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+  access-control:
+    build:
+      context: ../services/access-control
+      dockerfile: Dockerfile
+    container_name: dc-platform-access-control
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__AccessControlDb: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Search Path=access_control
+    ports:
+      - "5003:5003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+  audit:
+    build:
+      context: ../services/audit
+      dockerfile: Dockerfile
+    container_name: dc-platform-audit
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__AuditDb: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Search Path=audit
+    ports:
+      - "5004:5004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+  notification:
+    build:
+      context: ../services/notification
+      dockerfile: Dockerfile
+    container_name: dc-platform-notification
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "5005:5005"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5005/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+  configuration:
+    build:
+      context: ../services/configuration
+      dockerfile: Dockerfile
+    container_name: dc-platform-configuration
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__ConfigurationDb: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Search Path=configuration
+    ports:
+      - "5006:5006"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5006/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+  admin-api:
+    build:
+      context: ../services/admin-api
+      dockerfile: Dockerfile
+    container_name: dc-platform-admin-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ServiceUrls__Directory: http://directory:5001
+      ServiceUrls__Authentication: http://authentication:5002
+      ServiceUrls__AccessControl: http://access-control:5003
+      ServiceUrls__Audit: http://audit:5004
+      ServiceUrls__Notification: http://notification:5005
+      ServiceUrls__Configuration: http://configuration:5006
+    ports:
+      - "5007:5007"
+    depends_on:
+      directory:
+        condition: service_healthy
+      audit:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5007/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dc-platform
+
+volumes:
+  postgres_data:
+  keycloak_data:
+
+networks:
+  dc-platform:
+    driver: bridge

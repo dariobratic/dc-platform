@@ -6,6 +6,30 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.12] - 2025-01-30
+
+### Added - Docker Compose Infrastructure
+- **docker-compose.yml** — Full local development environment with 10 containers
+  - 8 application services (Gateway, Directory, Authentication, Access Control, Audit, Notification, Configuration, Admin API)
+  - PostgreSQL 17 with schema-per-service isolation
+  - Keycloak 26.1 with realm auto-import
+- **Dockerfiles** — Multi-stage .NET 10.0 builds for all 8 services
+  - Optimized layer caching (restore → build → publish)
+  - Clean Architecture services copy all project layers for restore
+- **Keycloak Realm Import** (`infrastructure/keycloak/realm-export.json`)
+  - `dc-platform` realm with brute-force protection
+  - `dc-platform-gateway` confidential client (auth code + service accounts)
+  - `dc-platform-admin` public SPA client (PKCE with S256)
+  - Protocol mappers: `tenant_id`, `organization_id`, `roles`
+  - Realm roles: `platform-admin`, `org-admin`, `org-member`
+- **Schema initialization** (`infrastructure/init-schemas.sql`) — creates `directory`, `access_control`, `audit`, `configuration`, `keycloak` schemas
+- **Environment configuration** (`.env.example`) — template for PostgreSQL and Keycloak credentials
+- Health checks on all containers with `depends_on: condition: service_healthy`
+- Gateway YARP clusters overridden to Docker service names
+- Admin API service URLs overridden to Docker service names
+
+---
+
 ## [0.11] - 2025-01-30
 
 ### Added - Admin API Service
