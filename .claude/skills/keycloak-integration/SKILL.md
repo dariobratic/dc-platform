@@ -456,3 +456,9 @@ client.interceptors.response.use((r) => r, async (error) => {
 | `apps/shell/src/stores/tenant.ts` | Org/workspace context (Pinia) |
 | `apps/shell/src/plugins/http.ts` | Axios with auth + tenant interceptors |
 | `apps/shell/src/router/index.ts` | Route guards (requiresAuth, requiresOrganization) |
+
+## Related Skills
+
+- `keycloak-admin` — Server-side realm configuration, client scopes, and realm-export.json. Use that skill for Keycloak config; use this skill for code integration.
+- `structured-logging` — Correlation ID middleware that runs alongside auth middleware
+- `troubleshooting` — When auth flows fail across services

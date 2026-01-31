@@ -134,6 +134,7 @@ Each service:
 | `dotnet-testing` | .NET test code | Writing unit/integration/E2E tests, test fixtures, Testcontainers setup |
 | `vue-frontend` | Vue.js frontend code | Vue 3 components, composables, Tailwind CSS, microfrontend apps, API client, i18n |
 | `python-backend` | Python service code | FastAPI services, Pydantic models, Python tooling |
+| `claude-architect` | Claude infrastructure | CLAUDE.md files, skills, agents, commands, hooks, learnings |
 
 ### Which Skill to Use
 
@@ -145,6 +146,15 @@ Each service:
 | `keycloak-admin` | `.claude/skills/keycloak-admin/SKILL.md` | realm-export.json, client scopes, auth error fixes, JWT debugging |
 | `troubleshooting` | `.claude/skills/troubleshooting/SKILL.md` | Test failures, cross-service debugging, correlation ID tracing, escalation decisions |
 | `windows-dev` | `.claude/skills/windows-dev/SKILL.md` | Shell commands on Windows, Git Bash quirks, path translation, Docker exec, curl/JSON |
+| `continuous-learning` | `.claude/skills/continuous-learning/SKILL.md` | Capturing non-trivial solution patterns, promoting learnings to skills |
+
+### Which Command to Use
+
+| Command | File | When |
+|---------|------|------|
+| `/commit` | `.claude/commands/commit.md` | Smart commit with tests, changelog, version bump, push |
+| `/learn` | `.claude/commands/learn.md` | Capture a reusable pattern from the current session |
+| `/claude-sync` | `.claude/commands/claude-sync.md` | Audit CLAUDE.md files, skills, agents for staleness |
 
 ### Decision Flow
 
@@ -164,7 +174,11 @@ Problem identified
   │
   ├─ Affects one service only? → Bug fix or refactor, just do it
   │
-  └─ Affects multiple services or architecture? → Create ADR in docs/adr/
+  ├─ Affects multiple services or architecture? → Create ADR in docs/adr/
+  │
+  ├─ Non-trivial fix worth remembering? → Use /learn command
+  │
+  └─ CLAUDE.md or skills seem stale? → Use /claude-sync command
 ```
 
 ### When NOT to Decide Alone

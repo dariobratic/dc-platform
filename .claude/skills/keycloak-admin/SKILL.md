@@ -475,3 +475,9 @@ Update this skill when:
 Do NOT update for:
 - One-off typos or config mistakes
 - Issues already covered in existing sections
+
+## Related Skills
+
+- `keycloak-integration` — Code-level JWT validation, auth middleware, and token handling in .NET/Vue.js. Use that skill for implementation; use this skill for server configuration.
+- `troubleshooting` — When auth errors require tracing across services via correlation IDs
+- `continuous-learning` — Capture non-obvious Keycloak behaviors as learnings

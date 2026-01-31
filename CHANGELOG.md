@@ -6,6 +6,18 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.32] - 2026-01-31
+
+### Added
+- **claude-architect agent** — Meta-agent for managing CLAUDE.md files, skills, agents, commands, hooks, and learnings
+- **continuous-learning skill** — Pattern capture and knowledge retention with promotion criteria
+- **/learn command** — Capture reusable patterns from current session into `.claude/learnings/`
+- **/claude-sync command** — Audit all CLAUDE.md files, skills, and agents for staleness and consistency
+- **Skill cross-references** — Added `## Related Skills` sections to all 6 existing skills with bidirectional links
+- **Command reference table** — Added "Which Command to Use" section to root CLAUDE.md decision flow
+
+---
+
 ## [0.31] - 2026-01-31
 
 ### Added

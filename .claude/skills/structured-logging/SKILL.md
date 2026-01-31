@@ -377,3 +377,9 @@ app.MapControllers();                             // 7. Routing
 - CorrelationId must be first so ALL logs have it
 - ExceptionHandling before Serilog ensures exceptions are caught and logged properly
 - Serilog logs the final status code after exception handling converts it to 4xx/5xx
+
+## Related Skills
+
+- `troubleshooting` — Using structured logs to trace requests across services via correlation IDs
+- `docker-compose` — Log volume mounts in docker-compose.yml and per-service log directories
+- `keycloak-integration` — Auth middleware that runs after correlation ID middleware in the pipeline

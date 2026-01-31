@@ -233,3 +233,9 @@ dotnet ef database update \
 
 6. **IPv6 in Alpine containers** - `localhost` resolves to `[::1]` in Alpine/BusyBox.
    Use `127.0.0.1` for health checks in nginx containers.
+
+## Related Skills
+
+- `docker-compose` — Container networking and health checks where path translation matters
+- `troubleshooting` — Debug commands that need Windows-compatible alternatives
+- `continuous-learning` — Capture platform-specific gotchas as learnings

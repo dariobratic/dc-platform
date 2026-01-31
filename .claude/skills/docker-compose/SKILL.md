@@ -129,3 +129,9 @@ FROM base AS final
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "{ServiceName}.API.dll"]
 ```
+
+## Related Skills
+
+- `troubleshooting` — Container debugging, health check failures, Docker build issues, and `docker compose logs` tracing
+- `structured-logging` — Log volume mounts and per-service log directory configuration
+- `windows-dev` — Docker exec path translation issues on Windows (use `sh -c`)

@@ -302,3 +302,12 @@ docker exec -it dc-platform-directory /bin/bash
 # Clean rebuild
 docker compose down -v && docker compose build --no-cache && docker compose up
 ```
+
+## Related Skills
+
+- `docker-compose` — Container setup, Dockerfile patterns, health checks, port mappings
+- `structured-logging` — Log format, correlation ID tracing, searching logs by request flow
+- `keycloak-admin` — Auth error debugging, JWT token inspection, scope/client config
+- `keycloak-integration` — Auth middleware ordering, token validation code
+- `windows-dev` — Platform-specific debugging quirks (path translation, temp files, curl piping)
+- `continuous-learning` — Capture non-trivial debugging patterns as reusable learnings
