@@ -78,6 +78,7 @@ Invitation
 - `PUT /api/v1/workspaces/{id}/members/{userId}` - Update role
 - `DELETE /api/v1/workspaces/{id}/members/{userId}` - Remove member
 - `GET /api/v1/users/{userId}/memberships` - User's memberships
+- `GET /api/v1/users/me/organizations` - Current user's organization (from JWT token)
 
 ### Invitations
 - `POST /api/v1/workspaces/{id}/invitations` - Create invitation

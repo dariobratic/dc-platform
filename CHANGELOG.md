@@ -6,6 +6,20 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.35] - 2026-01-31
+
+### Changed
+- **Documentation:** Full CLAUDE.md audit and sync across project
+- **Root CLAUDE.md** — Added project structure with ports, e2e/ and .claude/ directories, quick start, testing strategy (204 unit + 19 E2E), expanded pnpm scripts, updated infrastructure versions
+- **Authentication CLAUDE.md** — Rewrote to reflect signin/signup endpoints, ROPC flow, signup orchestration (7-step Keycloak + Directory), IDirectoryService dependency, FrontendClientId config
+- **Gateway CLAUDE.md** — Added missing YARP routes for /users, /admin; added Admin API port 5007
+- **Directory CLAUDE.md** — Added missing GET /api/v1/users/me/organizations endpoint
+
+### Added
+- **e2e/CLAUDE.md** — New documentation for Playwright E2E tests: Page Object Model, fixtures, auth state pattern, adding tests guide
+
+---
+
 ## [0.34] - 2026-01-31
 
 ### Added

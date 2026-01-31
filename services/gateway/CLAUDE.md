@@ -45,12 +45,14 @@ All routes are configured in `appsettings.json` under the `ReverseProxy` section
 | `/api/v1/workspaces/{**catch-all}` | Directory | 5001 |
 | `/api/v1/memberships/{**catch-all}` | Directory | 5001 |
 | `/api/v1/invitations/{**catch-all}` | Directory | 5001 |
+| `/api/v1/users/{**catch-all}` | Directory | 5001 |
 | `/api/v1/auth/{**catch-all}` | Authentication | 5002 |
 | `/api/v1/roles/{**catch-all}` | Access Control | 5003 |
 | `/api/v1/permissions/{**catch-all}` | Access Control | 5003 |
 | `/api/v1/audit/{**catch-all}` | Audit | 5004 |
 | `/api/v1/notifications/{**catch-all}` | Notification | 5005 |
 | `/api/v1/config/{**catch-all}` | Configuration | 5006 |
+| `/api/v1/admin/{**catch-all}` | Admin API | 5007 |
 
 YARP automatically forwards incoming requests to the appropriate downstream service based on the path pattern.
 
@@ -174,7 +176,7 @@ dotnet run --project src/Gateway.API --urls "http://localhost:5000"
 
 ## Development Notes
 
-- Default port: `5000` (HTTP), `5001` (HTTPS)
+- Default port: `5000` (HTTP)
 - Health endpoint: `http://localhost:5000/api/health`
 - No migrations or database setup required
 - No Clean Architecture setup needed (intentionally simple)

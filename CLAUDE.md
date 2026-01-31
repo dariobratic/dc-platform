@@ -6,24 +6,31 @@ Multi-tenant enterprise workflow automation platform. Foundation for Digital Con
 
 ```
 dc-platform/
-├── services/           # Backend microservices (.NET Core)
-│   ├── gateway/        # API Gateway/BFF
-│   ├── authentication/ # Keycloak integration
-│   ├── directory/      # Organization/Workspace/Membership
-│   ├── access-control/ # RBAC/ABAC permissions
-│   ├── audit/          # Immutable event log
-│   ├── notification/   # Email (ZeptoMail), future: SMS, push
-│   ├── configuration/  # Tenant config, feature flags
-│   └── admin-api/      # Admin orchestration layer
-├── apps/               # Frontend applications
-│   ├── shell/          # Microfrontend shell (Vue.js)
-│   ├── admin/          # Admin UI modules
-│   └── client/         # Client-facing modules
+├── services/           # Backend microservices (.NET Core 10)
+│   ├── gateway/        # API Gateway (YARP reverse proxy, port 5000)
+│   ├── authentication/ # Auth + signup orchestration (port 5002)
+│   ├── directory/      # Organization/Workspace/Membership (port 5001)
+│   ├── access-control/ # RBAC/ABAC permissions (port 5003)
+│   ├── audit/          # Immutable event log (port 5004)
+│   ├── notification/   # Email/push delivery (port 5005)
+│   ├── configuration/  # Tenant config, feature flags (port 5006)
+│   └── admin-api/      # Admin aggregation layer (port 5007)
+├── apps/               # Frontend applications (Vue.js 3 + Module Federation)
+│   ├── shell/          # Microfrontend host (port 3000)
+│   ├── admin/          # Admin remote (port 5173)
+│   └── client/         # Client remote (port 5174)
 ├── packages/           # Shared libraries
-│   ├── ui-kit/         # Shared Vue components
-│   ├── api-client/     # Generated API clients
+│   ├── ui-kit/         # Shared Vue components (8 Dc* components)
+│   ├── api-client/     # Typed API client functions per service
 │   └── shared-types/   # Cross-service TypeScript types
-├── infrastructure/     # Docker, K8s, deployment configs
+├── e2e/                # Playwright E2E tests (19 tests)
+├── infrastructure/     # Docker Compose, Dockerfiles, Keycloak config
+│   └── docker-compose.yml  # Full platform (14 containers)
+├── .claude/            # Claude Code infrastructure
+│   ├── agents/         # 8 agent definitions
+│   ├── skills/         # 7 technical skills
+│   ├── commands/       # 3 slash commands (/commit, /learn, /claude-sync)
+│   └── learnings/      # Captured solution patterns
 └── docs/               # Architecture documentation
 ```
 
@@ -43,10 +50,10 @@ dc-platform/
 - TypeScript strict mode
 
 ### Infrastructure
-- Keycloak for identity (single realm, tenant via attributes)
-- Redis for caching and session
-- RabbitMQ for async messaging
-- Docker Compose for local dev
+- Keycloak 26.1 for identity (single realm `dc-platform`, tenant via user attributes)
+- PostgreSQL 17 (shared instance, schema-per-service isolation)
+- Docker Compose for local dev (14 containers: 3 infra + 8 backend + 3 frontend)
+- Future: Redis for caching, RabbitMQ for async messaging
 
 ## Git Workflow
 
@@ -195,17 +202,60 @@ Escalate (ask the user or create an ADR) when:
 - Any breaking change to existing APIs
 - Introducing cross-service synchronous dependencies
 
+## Quick Start
+
+```bash
+# Start entire platform (all 14 containers)
+pnpm docker:up
+
+# Stop and clean up
+pnpm docker:down
+```
+
+Open `http://localhost:3000` (shell app) after containers are healthy.
+
+## Testing
+
+### Unit Tests (204 tests)
+```bash
+# Backend (.NET)
+dotnet test dc-platform.slnx --filter "Category!=Integration"
+
+# Frontend (Vitest + @vue/test-utils)
+pnpm test              # Run all 204 tests
+pnpm test:watch        # Watch mode
+pnpm test:coverage     # With coverage report
+```
+
+### E2E Tests (19 tests)
+```bash
+pnpm test:e2e          # Run Playwright tests (requires platform running)
+pnpm test:e2e:ui       # Playwright UI mode
+pnpm test:e2e:report   # View HTML report
+```
+
+E2E tests require the full platform running via `pnpm docker:up`.
+
 ## Commands
 
 ```bash
-# Backend service
+# Backend service (from service directory)
 dotnet build
 dotnet test
 dotnet run
 
-# Frontend
-pnpm install
-pnpm dev
-pnpm build
-pnpm test
+# Frontend (from root)
+pnpm install           # Install all workspace dependencies
+pnpm dev:all           # Start shell + admin + client dev servers
+pnpm build:remotes     # Build admin + client for production
+
+# Individual app dev servers
+pnpm dev:shell         # Shell on port 3000
+pnpm dev:admin         # Admin on port 5173
+pnpm dev:client        # Client on port 5174
+
+# Docker
+pnpm docker:up         # Start full platform
+pnpm docker:down       # Stop and remove containers
+pnpm docker:logs       # Follow container logs
 ```

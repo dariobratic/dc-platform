@@ -1,6 +1,6 @@
 # Authentication Service
 
-OAuth2 token operations service for DC Platform. Handles authorization code exchange, token refresh, and logout with Keycloak.
+OAuth2 token operations and user registration service for DC Platform. Handles authorization code exchange, token refresh, logout, custom signin/signup with Keycloak, and signup orchestration across Keycloak + Directory service.
 
 ## Service Scope
 
@@ -9,31 +9,36 @@ OAuth2 token operations service for DC Platform. Handles authorization code exch
 - Refreshing expired access tokens
 - Revoking refresh tokens on logout
 - Providing user information from JWT token claims
-- Token validation for protected endpoints
+- Custom signin via Resource Owner Password Credentials (ROPC) flow
+- Custom signup orchestration (Keycloak user creation + Directory org/workspace setup)
+- Keycloak user attribute management (organizationId, tenantId)
 
 ### This Service IS NOT Responsible For:
-- User registration or management (→ Keycloak)
 - Session storage (stateless token-based auth)
 - Password reset flows (→ Keycloak)
 - Multi-factor authentication logic (→ Keycloak)
 - Business logic or data persistence (no database)
+- Organization/workspace CRUD beyond initial signup (→ Directory Service)
 
 ## Architecture
 
-The Authentication service is a **stateless API service** that acts as a bridge between frontend applications and Keycloak. It does not follow Clean Architecture patterns as it has no business logic or domain model.
+The Authentication service is a **stateless API service** that acts as a bridge between frontend applications and Keycloak. For signin/signup, it also orchestrates calls to the Directory service to set up organizations and workspaces.
 
 ### Key Characteristics:
 - **No database** - Stateless, token-based authentication only
 - **No Clean Architecture layers** - Single API project
-- **Proxy to Keycloak** - Simplifies OAuth2 flow for frontend clients
+- **Keycloak proxy** - Simplifies OAuth2 flow for frontend clients
+- **Signup orchestrator** - Coordinates Keycloak + Directory for new user registration
 - **JWT validation** - Validates tokens issued by Keycloak
 
 ## API Endpoints
 
-### Authentication Flow
+All endpoints use route prefix `/api/v1/auth`.
 
-#### POST /api/auth/token
-Exchange authorization code for tokens.
+### Token Operations
+
+#### POST /api/v1/auth/token
+Exchange authorization code for tokens (standard OAuth2 code flow).
 
 **Request:**
 ```json
@@ -46,48 +51,43 @@ Exchange authorization code for tokens.
 **Response (200 OK):**
 ```json
 {
-  "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "accessToken": "eyJhbG...",
+  "refreshToken": "eyJhbG...",
   "expiresIn": 300,
   "tokenType": "Bearer"
 }
 ```
 
-**Error Responses:**
-- `400 Bad Request` - Invalid authorization code
-- `500 Internal Server Error` - Keycloak communication error
+**Errors:** `400` invalid code, `500` Keycloak error
 
-#### POST /api/auth/refresh
+#### POST /api/v1/auth/refresh
 Refresh an expired access token.
 
 **Request:**
 ```json
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "refreshToken": "eyJhbG..."
 }
 ```
 
-**Response (200 OK):**
+**Response (200 OK):** Same `TokenResponse` shape as token endpoint.
+
+**Errors:** `400` invalid/expired refresh token, `500` Keycloak error
+
+#### POST /api/v1/auth/logout
+Revoke refresh token (best-effort — always returns success).
+
+**Request:**
 ```json
 {
-  "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expiresIn": 300,
-  "tokenType": "Bearer"
+  "refreshToken": "eyJhbG..."
 }
 ```
 
-**Error Responses:**
-- `400 Bad Request` - Invalid or expired refresh token
-- `500 Internal Server Error` - Keycloak communication error
+**Response:** `204 No Content`
 
-#### GET /api/auth/userinfo
-Get current user information from JWT token.
-
-**Headers:**
-```
-Authorization: Bearer {access_token}
-```
+#### GET /api/v1/auth/userinfo
+Get current user information from JWT token claims. Requires `Authorization: Bearer` header.
 
 **Response (200 OK):**
 ```json
@@ -99,27 +99,67 @@ Authorization: Bearer {access_token}
 }
 ```
 
-**Error Responses:**
-- `401 Unauthorized` - Missing, invalid, or expired token
-- `500 Internal Server Error` - Error reading token claims
+**Errors:** `401` missing/invalid token
 
-#### POST /api/auth/logout
-Revoke refresh token and logout user.
+### Custom Authentication
+
+#### POST /api/v1/auth/signin
+Authenticate with email and password using ROPC flow (bypasses Keycloak login page).
 
 **Request:**
 ```json
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "email": "user@example.com",
+  "password": "password123"
 }
 ```
 
-**Response:**
-- `204 No Content` - Token revoked successfully (or best-effort)
+**Response (200 OK):** Same `TokenResponse` shape.
 
-**Note:** This endpoint always returns success even if token revocation fails, as the token will expire naturally.
+**Errors:** `401` invalid credentials, `429` account locked/rate limited, `500` unexpected error
+
+#### POST /api/v1/auth/signup
+Register a new user with organization setup. This is a multi-step orchestration endpoint.
+
+**Request:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "organizationName": "My Company"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "accessToken": "eyJhbG...",
+  "refreshToken": "eyJhbG...",
+  "expiresIn": 300,
+  "tokenType": "Bearer",
+  "userId": "guid",
+  "organizationId": "guid",
+  "workspaceId": "guid"
+}
+```
+
+**Errors:** `409` email already exists or org slug conflict, `500` unexpected error
+
+**Signup Orchestration Steps:**
+1. Create user in Keycloak (Admin API)
+2. Authenticate new user to get tokens (ROPC)
+3. Create organization in Directory service (slug auto-generated from name)
+4. Create default "General" workspace in organization
+5. Add user as "Owner" to workspace membership
+6. Update Keycloak user attributes with `organizationId` and `tenantId`
+7. Re-authenticate to get fresh token with org claims
+
+On partial failure after user creation, the orphaned Keycloak user is logged but not deleted.
 
 ### Health & Status
-- `GET /health` - Basic health check (ASP.NET Core standard)
+- `GET /health` - ASP.NET Core standard health check
 - `GET /api/health` - Detailed health response with service info
 
 ## Configuration
@@ -135,19 +175,24 @@ Revoke refresh token and logout user.
     "BaseUrl": "http://localhost:8080",
     "Realm": "dc-platform",
     "ClientId": "dc-platform-gateway",
-    "ClientSecret": "your-client-secret-here"
+    "ClientSecret": "your-client-secret-here",
+    "FrontendClientId": "dc-platform-admin"
   }
 }
 ```
 
-**Configuration Keys:**
-- `Authority` - Keycloak realm URL for JWT validation
-- `Audience` - Expected audience claim in JWT tokens
-- `RequireHttps` - Set to `false` for local development, `true` in production
-- `BaseUrl` - Keycloak server base URL
-- `Realm` - Keycloak realm name
-- `ClientId` - OAuth2 client ID (configured in Keycloak)
-- `ClientSecret` - OAuth2 client secret (should be from environment variable in production)
+- `ClientId` / `ClientSecret` - Backend confidential client (code flow)
+- `FrontendClientId` - Public client used for ROPC signin/signup flows
+
+### Service Dependencies (`appsettings.json`)
+
+```json
+{
+  "Services": {
+    "DirectoryUrl": "http://localhost:5001"
+  }
+}
+```
 
 ### CORS Settings
 
@@ -162,98 +207,91 @@ Revoke refresh token and logout user.
 }
 ```
 
-Add your frontend application URLs to allow cross-origin requests.
-
 ## Project Structure
 
 ```
 services/authentication/
 ├── src/
-│   └── Authentication.API/        # ASP.NET Core Web API
-│       ├── Controllers/           # AuthController
-│       ├── Models/                # Request/Response DTOs
-│       ├── Services/              # KeycloakService for HTTP calls
-│       ├── Properties/            # Launch settings
-│       ├── appsettings.json       # Configuration
+│   └── Authentication.API/
+│       ├── Controllers/
+│       │   └── AuthController.cs          # All 6 auth endpoints
+│       ├── Models/
+│       │   ├── TokenRequest.cs            # Code exchange request
+│       │   ├── TokenResponse.cs           # Standard token response
+│       │   ├── RefreshTokenRequest.cs      # Refresh request
+│       │   ├── LogoutRequest.cs           # Logout request
+│       │   ├── UserInfoResponse.cs        # JWT claims response
+│       │   ├── SigninRequest.cs           # Email + password
+│       │   ├── SignupRequest.cs           # Email + password + name + org
+│       │   ├── SignupResponse.cs          # Tokens + userId + orgId + wsId
+│       │   ├── KeycloakTokenResponse.cs   # Internal Keycloak response mapping
+│       │   ├── DirectoryModels.cs         # Directory service DTOs
+│       │   └── HealthResponse.cs          # Health check response
+│       ├── Services/
+│       │   ├── IKeycloakService.cs        # Keycloak operations interface
+│       │   ├── KeycloakService.cs         # Token exchange, user creation, ROPC
+│       │   ├── IDirectoryService.cs       # Directory operations interface
+│       │   └── DirectoryService.cs        # Org/workspace/member creation
+│       ├── Middleware/
+│       │   ├── CorrelationIdMiddleware.cs
+│       │   └── ExceptionHandlingMiddleware.cs
+│       ├── Properties/
+│       │   └── launchSettings.json
+│       ├── appsettings.json
+│       ├── appsettings.Development.json
 │       ├── Authentication.API.csproj
 │       └── Program.cs
 │
 ├── Authentication.slnx
-├── CLAUDE.md                      # This file
+├── CLAUDE.md
 └── README.md
 ```
 
-## Technical Requirements
+## Downstream Dependencies
 
-### No Database
-This service is stateless and does not persist any data. All authentication state is managed by Keycloak through JWT tokens.
+| Service | How Used |
+|---------|----------|
+| Keycloak (port 8080) | Token exchange, user creation (Admin API), attribute updates, ROPC auth |
+| Directory (port 5001) | Org/workspace/member creation during signup |
 
-### No Domain Logic
-This service acts as a proxy/adapter for Keycloak's OAuth2 endpoints. It does not contain business logic.
+### Keycloak Admin API Endpoints Used
+- `POST /admin/realms/{realm}/users` - Create new user
+- `PUT /admin/realms/{realm}/users/{id}` - Update user attributes
+- `POST /realms/{realm}/protocol/openid-connect/token` - Token exchange + ROPC
+- `POST /realms/{realm}/protocol/openid-connect/revoke` - Token revocation
 
-### Dependencies
-- `Microsoft.AspNetCore.OpenApi` - API documentation
-- `Microsoft.AspNetCore.Authentication.JwtBearer` - JWT token validation
-- ASP.NET Core Health Checks for monitoring
-
-## Keycloak Integration
-
-### Token Endpoints Used
-- **Token Exchange:** `POST /realms/{realm}/protocol/openid-connect/token`
-  - Exchanges authorization code for tokens
-  - Refreshes access tokens using refresh tokens
-- **Token Revocation:** `POST /realms/{realm}/protocol/openid-connect/revoke`
-  - Revokes refresh tokens on logout
-
-### OAuth2 Flows
-
-#### Authorization Code Flow
-1. Frontend redirects user to Keycloak login page
-2. User authenticates with Keycloak
-3. Keycloak redirects back with authorization code
-4. Frontend calls `POST /api/auth/token` with code
-5. Service exchanges code for tokens with Keycloak
-6. Frontend stores tokens and uses access token for API calls
-
-#### Token Refresh Flow
-1. Frontend detects access token expiration (or 401 response)
-2. Frontend calls `POST /api/auth/refresh` with refresh token
-3. Service requests new tokens from Keycloak
-4. Frontend replaces old access token with new one
-
-#### Logout Flow
-1. Frontend calls `POST /api/auth/logout` with refresh token
-2. Service revokes refresh token in Keycloak
-3. Frontend clears stored tokens
+### Directory Service Endpoints Called
+- `POST /api/v1/organizations` - Create organization
+- `POST /api/v1/organizations/{id}/workspaces` - Create workspace
+- `POST /api/v1/workspaces/{id}/members` - Add member
 
 ## Coding Rules for This Service
 
 1. **Stateless Only**: Never store tokens or user state in memory or cache
-2. **No Business Logic**: Only token operations and claims extraction
-3. **Error Handling**: Map Keycloak HTTP errors to appropriate API responses
-4. **Logging**: Log authentication events for security auditing
-5. **Best-Effort Logout**: Token revocation failures should not block logout
-6. **Claims-Based UserInfo**: Extract user info from validated JWT claims, don't call Keycloak userinfo endpoint
+2. **Error Mapping**: Map Keycloak HTTP errors to appropriate API responses
+3. **Logging**: Log all auth events for security auditing (never log tokens/passwords)
+4. **Best-Effort Logout**: Token revocation failures should not block logout
+5. **Claims-Based UserInfo**: Extract user info from validated JWT claims
+6. **Typed HttpClients**: Use `IKeycloakService` and `IDirectoryService` interfaces
+7. **Slug Generation**: Organization slugs generated from name using `GenerateSlug()` utility
 
 ## Security Considerations
 
-1. **Client Secret Protection**: Never commit real secrets to git. Use environment variables in production.
-2. **HTTPS in Production**: Set `RequireHttps: true` for production deployments
-3. **Token Storage**: Access tokens should be stored securely by frontend (httpOnly cookies or secure storage)
-4. **Token Expiration**: Access tokens are short-lived (5 minutes default), refresh tokens are long-lived
+1. **Client Secret Protection**: Never commit real secrets — use environment variables
+2. **HTTPS in Production**: Set `RequireHttps: true`
+3. **ROPC Flow**: Only used for custom signin/signup, not for general auth
+4. **Keycloak Admin Credentials**: Required for user creation — protect in production
 5. **CORS Configuration**: Only allow trusted frontend origins
+6. **Token Expiration**: Access tokens 5 minutes, refresh tokens are long-lived
 
 ## Logging
 
-This service uses structured JSON logging via Serilog (see `.claude/skills/structured-logging/SKILL.md`).
+Structured JSON logging via Serilog (see `.claude/skills/structured-logging/SKILL.md`).
 
 - **Log output**: Console (structured text) + File (JSON)
 - **File path**: `infrastructure/logs/authentication/log-{date}.json`
 - **Rotation**: Daily, 30-day retention
 - **Correlation ID**: All requests tagged via `X-Correlation-Id` header
-- **Context enrichment**: RequestMethod, RequestPath, UserId, OrganizationId, WorkspaceId
-
-See the structured-logging skill for log level guidelines and best practices.
 
 ## Commands
 
@@ -271,64 +309,46 @@ dotnet run --project src/Authentication.API --urls "http://localhost:5002"
 
 - Default port: `5002` (HTTP)
 - Health endpoint: `http://localhost:5002/api/health`
-- OpenAPI docs (dev only): `http://localhost:5002/openapi/v1.json`
 - No migrations or database setup required
-- No Clean Architecture setup needed (intentionally simple)
-- Keycloak must be running on `http://localhost:8080` with `dc-platform` realm configured
+- Keycloak must be running on `http://localhost:8080` with `dc-platform` realm
+- Directory service must be running on `http://localhost:5001` for signup flow
 
 ## Testing the Service
 
 ### Prerequisites
 1. Keycloak running on port 8080
-2. Realm `dc-platform` created
-3. Client `dc-platform-gateway` configured with:
-   - Client authentication enabled (confidential client)
-   - Standard flow enabled (authorization code flow)
-   - Valid redirect URIs configured
+2. Realm `dc-platform` created with auto-import from `infrastructure/keycloak/realm-export.json`
+3. Client `dc-platform-gateway` (confidential) and `dc-platform-admin` (public) configured
+4. Directory service running on port 5001 (for signup)
 
 ### Manual Testing
 
-1. **Health Check:**
 ```bash
+# Health check
 curl http://localhost:5002/api/health
-```
 
-2. **Token Exchange** (requires valid authorization code from Keycloak):
-```bash
-curl -X POST http://localhost:5002/api/auth/token \
+# Signin (ROPC)
+curl -X POST http://localhost:5002/api/v1/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"password123"}'
+
+# Signup (creates user + org + workspace)
+curl -X POST http://localhost:5002/api/v1/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"new@example.com","password":"Password1!","firstName":"John","lastName":"Doe","organizationName":"My Company"}'
+
+# Token exchange (requires valid auth code)
+curl -X POST http://localhost:5002/api/v1/auth/token \
   -H "Content-Type: application/json" \
   -d '{"code":"AUTH_CODE","redirectUri":"http://localhost:3000/callback"}'
-```
 
-3. **Token Refresh:**
-```bash
-curl -X POST http://localhost:5002/api/auth/refresh \
-  -H "Content-Type: application/json" \
-  -d '{"refreshToken":"REFRESH_TOKEN"}'
-```
-
-4. **User Info:**
-```bash
-curl http://localhost:5002/api/auth/userinfo \
+# User info (requires valid access token)
+curl http://localhost:5002/api/v1/auth/userinfo \
   -H "Authorization: Bearer ACCESS_TOKEN"
-```
-
-5. **Logout:**
-```bash
-curl -X POST http://localhost:5002/api/auth/logout \
-  -H "Content-Type: application/json" \
-  -d '{"refreshToken":"REFRESH_TOKEN"}'
 ```
 
 ## Related Services
 
-- **Gateway Service** - Routes requests to this service (port 5000)
-- **Keycloak** - Identity provider (port 8080)
-- **Directory Service** - User organization/workspace management (port 5001)
-
-## Support
-
-For questions or issues, refer to:
-- Main platform documentation at `docs/`
-- Keycloak documentation: https://www.keycloak.org/docs/latest/
-- OAuth2 specification: https://oauth.net/2/
+- **Gateway** (port 5000) - Routes `/api/v1/auth/**` to this service
+- **Keycloak** (port 8080) - Identity provider, user storage
+- **Directory** (port 5001) - Organization/workspace creation during signup
