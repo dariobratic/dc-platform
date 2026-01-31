@@ -6,6 +6,13 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.34] - 2026-01-31
+
+### Added
+- **dc-platform-architect agent** — Domain expert for architecture decisions: service boundaries, API design, DB schemas, multi-tenancy, cross-service communication, and security patterns
+
+---
+
 ## [0.33] - 2026-01-31
 
 ### Fixed

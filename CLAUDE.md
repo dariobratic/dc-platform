@@ -137,6 +137,7 @@ Each service:
 | `vue-testing` | Vue.js test code | Vitest + @vue/test-utils for components, stores, composables, API client |
 | `e2e-testing` | E2E test code | Playwright browser tests, Page Object Model, auth flows, multi-app testing |
 | `claude-architect` | Claude infrastructure | CLAUDE.md files, skills, agents, commands, hooks, learnings |
+| `dc-platform-architect` | Architecture decisions | Service boundaries, API design, DB schemas, multi-tenancy, cross-service comms |
 
 ### Which Skill to Use
 
@@ -170,13 +171,15 @@ Problem identified
   ├─ New feature in existing service? → Use dotnet-backend agent
   │     └─ Then write tests → Use dotnet-testing agent
   │
-  ├─ New service? → Use dotnet-backend agent + docker-compose skill
+  ├─ New service? → Use dc-platform-architect agent first, then dotnet-backend + docker-compose
   │
   ├─ Cross-service issue? → Follow troubleshooting skill (cross-service debugging)
   │
   ├─ Affects one service only? → Bug fix or refactor, just do it
   │
-  ├─ Affects multiple services or architecture? → Create ADR in docs/adr/
+  ├─ Affects multiple services or architecture? → Use dc-platform-architect agent
+  │
+  ├─ API design or DB schema decision? → Use dc-platform-architect agent
   │
   ├─ Non-trivial fix worth remembering? → Use /learn command
   │
