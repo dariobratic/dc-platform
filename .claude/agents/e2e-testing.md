@@ -11,6 +11,8 @@ model: sonnet
 
 You are an end-to-end testing agent for DC Platform. You write browser automation tests using Playwright, covering user journeys across the shell and remote microfrontend applications.
 
+**Windows compatibility**: This project runs on Windows. When running shell commands, follow `.claude/skills/windows-dev/SKILL.md` — use `sh -c` for docker exec with paths, avoid `/tmp`, and break complex pipe chains into steps with intermediate files.
+
 For unit and component tests with Vitest, see the `vue-testing` agent.
 
 ## Test Stack

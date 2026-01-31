@@ -8,7 +8,7 @@
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
-  "bruteForceProtected": true,
+  "bruteForceProtected": false,
   "permanentLockout": false,
   "maxFailureWaitSeconds": 900,
   "minimumQuickLoginWaitSeconds": 60,
@@ -391,11 +391,107 @@
     "offline_access",
     "dc-platform-scope"
   ],
-  "scopeMappings": [],
-  "serviceAccountClientRoles": {
-    "dc-platform-gateway": {
-      "realm-management": ["manage-users", "view-users"]
+  "users": [
+    {
+      "username": "service-account-dc-platform-gateway",
+      "enabled": true,
+      "serviceAccountClientId": "dc-platform-gateway",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users"
+        ]
+      }
     }
+  ],
+  "scopeMappings": [],
+  "attributes": {
+    "userProfileEnabled": "true"
+  },
+  "userProfile": {
+    "attributes": [
+      {
+        "name": "username",
+        "displayName": "${username}",
+        "validations": {
+          "length": { "min": 3, "max": 255 },
+          "username-prohibited-characters": {},
+          "up-username-not-idn-homograph": {}
+        },
+        "permissions": {
+          "view": ["admin", "user"],
+          "edit": ["admin", "user"]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "email",
+        "displayName": "${email}",
+        "validations": {
+          "email": {},
+          "length": { "max": 255 }
+        },
+        "required": { "roles": ["user"] },
+        "permissions": {
+          "view": ["admin", "user"],
+          "edit": ["admin", "user"]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "firstName",
+        "displayName": "${firstName}",
+        "validations": {
+          "length": { "max": 255 },
+          "person-name-prohibited-characters": {}
+        },
+        "required": { "roles": ["user"] },
+        "permissions": {
+          "view": ["admin", "user"],
+          "edit": ["admin", "user"]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "lastName",
+        "displayName": "${lastName}",
+        "validations": {
+          "length": { "max": 255 },
+          "person-name-prohibited-characters": {}
+        },
+        "required": { "roles": ["user"] },
+        "permissions": {
+          "view": ["admin", "user"],
+          "edit": ["admin", "user"]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "organizationId",
+        "displayName": "Organization ID",
+        "permissions": {
+          "view": ["admin"],
+          "edit": ["admin"]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "tenantId",
+        "displayName": "Tenant ID",
+        "permissions": {
+          "view": ["admin"],
+          "edit": ["admin"]
+        },
+        "multivalued": false
+      }
+    ],
+    "groups": [
+      {
+        "name": "user-metadata",
+        "displayHeader": "User metadata",
+        "displayDescription": "Attributes, which refer to user metadata"
+      }
+    ]
   },
   "accessTokenLifespan": 300,
   "ssoSessionIdleTimeout": 1800,

@@ -29,7 +29,7 @@ test.describe('Signup flow', () => {
     await expect(page).toHaveURL('/dashboard', { timeout: 15000 })
 
     // Dashboard should show welcome message
-    await expect(page.getByText('Dashboard')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
   })
 
   test('shows slug preview when typing organization name', async ({

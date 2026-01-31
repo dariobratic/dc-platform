@@ -143,13 +143,13 @@ public class AuthController : ControllerBase
             var tokenResponse = await _keycloakService.AuthenticateWithPasswordAsync(request.Email, request.Password, cancellationToken);
             return Ok(tokenResponse);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+                                               ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
             _logger.LogWarning("Invalid credentials for {Email}", request.Email);
             return Unauthorized(new { error = "invalid_credentials", error_description = "Invalid email or password" });
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests ||
-                                               (ex.StatusCode == System.Net.HttpStatusCode.BadRequest && ex.Message.Contains("Account is not fully set up")))
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
         {
             _logger.LogWarning("Account locked or rate limited for {Email}", request.Email);
             return StatusCode(StatusCodes.Status429TooManyRequests, new { error = "too_many_attempts", error_description = "Too many login attempts. Please try again later." });

@@ -152,17 +152,19 @@ public class KeycloakService : IKeycloakService
 
         var userUrl = $"{AdminUsersEndpoint}/{userId}";
 
-        // First, get existing user to merge attributes
+        // Get the full user representation to preserve all fields
         using var getRequest = new HttpRequestMessage(HttpMethod.Get, userUrl);
         getRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", adminToken);
         var getResponse = await _httpClient.SendAsync(getRequest, cancellationToken);
         getResponse.EnsureSuccessStatusCode();
 
         var userJson = await getResponse.Content.ReadAsStringAsync(cancellationToken);
-        using var userDoc = JsonDocument.Parse(userJson);
-        var existingAttributes = new Dictionary<string, List<string>>();
+        var userDict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(userJson)
+            ?? throw new InvalidOperationException("Failed to deserialize user representation");
 
-        if (userDoc.RootElement.TryGetProperty("attributes", out var attrElement))
+        // Parse existing attributes
+        var existingAttributes = new Dictionary<string, List<string>>();
+        if (userDict.TryGetValue("attributes", out var attrElement) && attrElement.ValueKind == JsonValueKind.Object)
         {
             foreach (var prop in attrElement.EnumerateObject())
             {
@@ -181,8 +183,10 @@ public class KeycloakService : IKeycloakService
             existingAttributes[kvp.Key] = kvp.Value;
         }
 
-        var updatePayload = new { attributes = existingAttributes };
-        var json = JsonSerializer.Serialize(updatePayload);
+        // Send back the full user representation with updated attributes
+        // This prevents Keycloak from resetting fields like emailVerified
+        userDict["attributes"] = JsonSerializer.SerializeToElement(existingAttributes);
+        var json = JsonSerializer.Serialize(userDict);
         using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         using var putRequest = new HttpRequestMessage(HttpMethod.Put, userUrl) { Content = content };
         putRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", adminToken);

@@ -16,15 +16,11 @@ setup('authenticate', async ({ page }) => {
     timeout: 15000,
   })
 
-  // If on org picker, select first org to complete auth
+  // If on org picker, wait for it to resolve (auto-select or manual)
   if (page.url().includes('select-organization')) {
-    // Wait for orgs to load
-    await page.waitForResponse('**/api/v1/users/me/organizations')
-
-    // Select first available organization
-    await page.locator('button.w-full.border').first().click()
-
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 })
+    // The org picker auto-selects when there's only one org,
+    // so just wait for dashboard rather than clicking a button
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 })
   }
 
   // Save auth + storage state for reuse

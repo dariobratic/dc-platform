@@ -27,30 +27,16 @@ test.describe('Signin flow', () => {
 
   test('user selects organization and sees dashboard', async ({
     loginPage,
-    orgPickerPage,
     page,
   }) => {
     await loginPage.goto()
     await loginPage.login(TEST_EMAIL, TEST_PASSWORD)
 
-    // Wait for post-login redirect
-    await expect(page).toHaveURL(/\/(select-organization|dashboard)/, {
-      timeout: 15000,
-    })
-
-    // If on org picker, select an org
-    if (page.url().includes('select-organization')) {
-      await expect(orgPickerPage.heading).toHaveText('Select Organization')
-
-      // Wait for organizations to load (spinner disappears)
-      await orgPickerPage.loadingSpinner.waitFor({ state: 'detached', timeout: 10000 })
-
-      // Select first organization
-      await orgPickerPage.selectFirstOrganization()
-    }
+    // Wait for redirect through org picker to dashboard
+    // The org picker auto-selects when there's only one organization
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 })
 
     // Should now be on dashboard
-    await expect(page).toHaveURL('/dashboard', { timeout: 10000 })
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
   })
 

@@ -122,8 +122,12 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       Keycloak__Authority: http://keycloak:8080/realms/dc-platform
+      Keycloak__BaseUrl: http://keycloak:8080
+      Keycloak__Realm: dc-platform
       Keycloak__ClientId: ${KEYCLOAK_CLIENT_ID}
       Keycloak__ClientSecret: ${KEYCLOAK_CLIENT_SECRET}
+      Keycloak__FrontendClientId: dc-platform-admin
+      Services__DirectoryUrl: http://directory:5001
     ports:
       - "5002:5002"
     depends_on:
@@ -263,7 +267,7 @@ services:
     ports:
       - "5173:80"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -283,7 +287,7 @@ services:
     ports:
       - "5174:80"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -309,7 +313,7 @@ services:
       client:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3

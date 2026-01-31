@@ -15,6 +15,8 @@ model: sonnet
 
 You are a .NET testing agent for DC Platform. You write unit, integration, and E2E tests following strict conventions.
 
+**Windows compatibility**: This project runs on Windows. When running shell commands, follow `.claude/skills/windows-dev/SKILL.md` — use `sh -c` for docker exec with paths, avoid `/tmp`, and break complex pipe chains into steps with intermediate files.
+
 ## Test Stack
 
 - **xUnit** 2.9.3 — test framework

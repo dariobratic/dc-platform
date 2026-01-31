@@ -6,6 +6,20 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.30] - 2026-01-31
+
+### Fixed
+- **Auth API error handling** — AuthController SignIn now catches HTTP 401 from Keycloak (not just 400) for invalid ROPC credentials
+- **Keycloak user update** — KeycloakService UpdateUserAttributesAsync sends full user representation to prevent Keycloak from resetting emailVerified
+- **HTTP interceptor** — Shell app skips auth token injection and 401 auto-logout for public auth endpoints (signin, signup, token, refresh), preventing signinSilent() from hanging
+- **Logout flow** — Shell auth store uses removeUser() with backend token revocation instead of signoutRedirect() which fails with ROPC flow
+- **DcInput accessibility** — Added aria-hidden to required asterisk span so Playwright getByLabel matches correctly
+- **Database auto-migration** — Added MigrateAsync() on startup for directory, access-control, audit, and configuration services
+- **Keycloak realm config** — Added service account roles (manage-users, view-users), user profile attributes (organizationId, tenantId), disabled brute force protection for test stability
+- **E2E test stability** — Fixed auth setup, signout, signin, signup tests to handle org picker auto-select, sessionStorage limitations, and parallel execution
+
+---
+
 ## [0.29] - 2026-01-31
 
 ### Added

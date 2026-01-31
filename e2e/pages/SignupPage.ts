@@ -15,11 +15,11 @@ export class SignupPage extends BasePage {
   }
 
   get passwordInput(): Locator {
-    return this.page.getByLabel('Password', { exact: true })
+    return this.page.locator('input[type="password"]').first()
   }
 
   get confirmPasswordInput(): Locator {
-    return this.page.getByLabel('Confirm Password')
+    return this.page.locator('input[type="password"]').nth(1)
   }
 
   get organizationNameInput(): Locator {

@@ -144,6 +144,7 @@ Each service:
 | `keycloak-integration` | `.claude/skills/keycloak-integration/SKILL.md` | JWT validation, auth middleware, token handling in .NET/Vue.js code |
 | `keycloak-admin` | `.claude/skills/keycloak-admin/SKILL.md` | realm-export.json, client scopes, auth error fixes, JWT debugging |
 | `troubleshooting` | `.claude/skills/troubleshooting/SKILL.md` | Test failures, cross-service debugging, correlation ID tracing, escalation decisions |
+| `windows-dev` | `.claude/skills/windows-dev/SKILL.md` | Shell commands on Windows, Git Bash quirks, path translation, Docker exec, curl/JSON |
 
 ### Decision Flow
 

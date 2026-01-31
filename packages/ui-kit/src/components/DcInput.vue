@@ -60,7 +60,7 @@ const handleInput = (event: Event) => {
       class="block text-sm font-medium text-gray-700 mb-1"
     >
       {{ label }}
-      <span v-if="required" class="text-red-500 ml-1">*</span>
+      <span v-if="required" class="text-red-500 ml-1" aria-hidden="true">*</span>
     </label>
     <input
       :id="inputId"

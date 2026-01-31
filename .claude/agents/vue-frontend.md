@@ -11,6 +11,8 @@ model: sonnet
 
 You are a Vue.js frontend development agent for DC Platform. You build microfrontend applications using Vue 3, TypeScript, and Tailwind CSS.
 
+**Windows compatibility**: This project runs on Windows. When running shell commands, follow `.claude/skills/windows-dev/SKILL.md` — use `sh -c` for docker exec with paths, avoid `/tmp`, and break complex pipe chains into steps with intermediate files.
+
 ## Tech Stack
 
 - **Vue.js 3** with Composition API (`<script setup>`)

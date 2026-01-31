@@ -14,11 +14,17 @@ export function createHttpClient(): AxiosInstance {
 
   client.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
-      const authStore = useAuthStore()
-      const token = await authStore.getAccessToken()
+      // Skip auth token for public auth endpoints
+      const publicPaths = ['/api/v1/auth/signin', '/api/v1/auth/signup', '/api/v1/auth/token', '/api/v1/auth/refresh', '/api/v1/auth/logout']
+      const isPublic = publicPaths.some(p => config.url?.includes(p))
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+      if (!isPublic) {
+        const authStore = useAuthStore()
+        const token = await authStore.getAccessToken()
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
       }
 
       return config
@@ -50,7 +56,11 @@ export function createHttpClient(): AxiosInstance {
   client.interceptors.response.use(
     (response) => response,
     async (error) => {
-      if (error.response?.status === 401) {
+      // Don't auto-logout on 401 from auth endpoints (invalid credentials is expected)
+      const url = error.config?.url ?? ''
+      const isAuthEndpoint = ['/api/v1/auth/signin', '/api/v1/auth/signup', '/api/v1/auth/token', '/api/v1/auth/refresh'].some(p => url.includes(p))
+
+      if (error.response?.status === 401 && !isAuthEndpoint) {
         const authStore = useAuthStore()
         console.error('Unauthorized request, redirecting to login')
         await authStore.logout()

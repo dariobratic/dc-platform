@@ -7,7 +7,7 @@ test.describe('Invalid credentials', () => {
   test('wrong password shows error message', async ({ loginPage, page }) => {
     await loginPage.goto()
 
-    await loginPage.login('test@example.com', 'WrongPassword123')
+    await loginPage.login('nonexistent-wrong-pw@example.com', 'WrongPassword123')
 
     // Error alert should appear with the invalid credentials message
     await expect(loginPage.errorAlert).toBeVisible({ timeout: 10000 })
@@ -38,7 +38,7 @@ test.describe('Invalid credentials', () => {
   test('error alert can be dismissed', async ({ loginPage }) => {
     await loginPage.goto()
 
-    await loginPage.login('test@example.com', 'WrongPassword123')
+    await loginPage.login('nonexistent-dismiss@example.com', 'WrongPassword123')
 
     await expect(loginPage.errorAlert).toBeVisible({ timeout: 10000 })
 

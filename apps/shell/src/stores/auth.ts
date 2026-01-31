@@ -34,7 +34,18 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout(): Promise<void> {
-    await userManager.signoutRedirect()
+    try {
+      // Revoke refresh token via backend
+      const currentUser = await userManager.getUser()
+      if (currentUser?.refresh_token) {
+        await http.post('/api/v1/auth/logout', { refreshToken: currentUser.refresh_token }).catch(() => {})
+      }
+    } catch {
+      // Best-effort token revocation
+    }
+
+    // Clear oidc-client-ts state
+    await userManager.removeUser()
     user.value = null
   }
 
