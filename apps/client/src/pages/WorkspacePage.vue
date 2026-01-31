@@ -35,6 +35,15 @@ onMounted(async () => {
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString()
 }
+
+function roleBadgeVariant(role: string): 'warning' | 'info' | 'success' | 'default' {
+  switch (role) {
+    case 'Owner': return 'warning'
+    case 'Admin': return 'info'
+    case 'Member': return 'success'
+    default: return 'default'
+  }
+}
 </script>
 
 <template>
@@ -134,7 +143,7 @@ function formatDate(dateString: string): string {
                 <tr v-for="member in members" :key="member.id" class="hover:bg-gray-50">
                   <td class="px-4 py-3 text-sm text-gray-900">{{ member.userId }}</td>
                   <td class="px-4 py-3 text-sm">
-                    <DcBadge variant="info" size="sm">{{ member.role }}</DcBadge>
+                    <DcBadge :variant="roleBadgeVariant(member.role)" size="sm">{{ member.role }}</DcBadge>
                   </td>
                   <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(member.joinedAt) }}</td>
                 </tr>

@@ -26,6 +26,12 @@ const routes: RouteRecordRaw[] = [
     meta: { breadcrumb: 'Workspaces' },
   },
   {
+    path: 'workspaces/:id',
+    name: 'admin-workspace-detail',
+    component: () => import('./pages/WorkspaceDetailPage.vue'),
+    meta: { breadcrumb: 'Workspace Detail' },
+  },
+  {
     path: 'users',
     name: 'admin-users',
     component: () => import('./pages/UsersPage.vue'),

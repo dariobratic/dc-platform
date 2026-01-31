@@ -6,6 +6,25 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.31] - 2026-01-31
+
+### Added
+- **Workspace detail page** — New admin page (`/admin/workspaces/:id`) with overview, members management, and settings tabs (rename, delete)
+- **Organization member management** — Full members tab in org detail with collapsible workspace sections, add/remove members, and role changes
+- **Workspace switcher** — Header dropdown to switch workspace context, fetches workspaces for current org
+- **Organization inline edit** — Edit organization name directly from the overview tab
+- **Workspace delete** — Delete button on workspace cards in org detail with confirmation dialog
+
+### Fixed
+- **Signup dashboard display** — Pass organization object to tenant store after signup so dashboard shows actual org name instead of "Unknown"
+- **Role badge colors** — Client workspace members tab now uses role-dependent badge colors (Owner/Admin/Member/Viewer)
+
+### Changed
+- **Tenant store** — Added `currentWorkspace` state and updated `setWorkspace` to accept optional workspace object
+- **Gitignore** — Added `tmp_*.json` pattern to exclude temporary API debugging files
+
+---
+
 ## [0.30] - 2026-01-31
 
 ### Fixed

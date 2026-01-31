@@ -82,7 +82,13 @@ async function handleSubmit() {
       organizationName: form.value.organizationName,
     })
 
-    tenantStore.setOrganization(response.organizationId)
+    const orgObject = {
+      id: response.organizationId,
+      name: form.value.organizationName,
+      slug: orgSlug.value,
+      createdAt: new Date().toISOString(),
+    }
+    tenantStore.setOrganization(response.organizationId, orgObject)
     tenantStore.setWorkspace(response.workspaceId)
     await router.push('/dashboard')
   } catch (err) {

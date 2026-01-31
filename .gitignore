@@ -45,3 +45,6 @@ dist/
 
 # Claude Code
 .claude/settings.local.json
+
+# Temporary API debugging files (windows-dev skill)
+tmp_*.json
