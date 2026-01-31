@@ -44,6 +44,7 @@ Admin microfrontend for DC Platform. Module Federation remote exposing admin rou
 - `src/pages/OrganizationsPage.vue` - Organization list with search + create/delete
 - `src/pages/OrganizationDetailPage.vue` - Single org with tabs (overview, workspaces, members)
 - `src/pages/WorkspacesPage.vue` - All workspaces with org filter
+- `src/pages/WorkspaceDetailPage.vue` - Single workspace with tabs (overview, members, settings)
 - `src/pages/UsersPage.vue` - User management placeholder (coming soon)
 - `src/pages/RolesPage.vue` - Role management with permission assignment
 - `src/pages/AuditLogPage.vue` - Audit log with filters and pagination

@@ -134,6 +134,8 @@ Each service:
 | `dotnet-testing` | .NET test code | Writing unit/integration/E2E tests, test fixtures, Testcontainers setup |
 | `vue-frontend` | Vue.js frontend code | Vue 3 components, composables, Tailwind CSS, microfrontend apps, API client, i18n |
 | `python-backend` | Python service code | FastAPI services, Pydantic models, Python tooling |
+| `vue-testing` | Vue.js test code | Vitest + @vue/test-utils for components, stores, composables, API client |
+| `e2e-testing` | E2E test code | Playwright browser tests, Page Object Model, auth flows, multi-app testing |
 | `claude-architect` | Claude infrastructure | CLAUDE.md files, skills, agents, commands, hooks, learnings |
 
 ### Which Skill to Use

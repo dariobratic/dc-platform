@@ -50,6 +50,7 @@ The shell does **NOT** own:
 
 ### Pages
 - `src/pages/DashboardPage.vue` - Main landing page after login
+- `src/pages/SignupPage.vue` - Custom signup form with org creation
 - `src/pages/AdminPlaceholder.vue` - Placeholder for admin remote
 - `src/pages/ClientPlaceholder.vue` - Placeholder for client remote
 
@@ -66,6 +67,7 @@ The shell does **NOT** own:
 |------|---------|---------------|--------------|
 | `/` | Root redirect | - | - |
 | `/login` | Trigger Keycloak login | No | No |
+| `/signup` | Custom signup flow | No | No |
 | `/callback` | OAuth callback handler | No | No |
 | `/select-organization` | Org picker | Yes | No |
 | `/dashboard` | Main dashboard | Yes | Yes |

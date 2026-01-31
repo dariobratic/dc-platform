@@ -6,6 +6,15 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.33] - 2026-01-31
+
+### Fixed
+- **Root CLAUDE.md** — Added missing `vue-testing` and `e2e-testing` agents to decision table
+- **Shell CLAUDE.md** — Added missing `SignupPage.vue` to Pages section and `/signup` route to Routes table
+- **Admin CLAUDE.md** — Added missing `WorkspaceDetailPage.vue` to Pages section
+
+---
+
 ## [0.32] - 2026-01-31
 
 ### Added
