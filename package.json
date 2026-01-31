@@ -21,7 +21,13 @@
     "dev:all": "pnpm --parallel --filter shell --filter admin --filter client dev",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm --filter @dc-platform/e2e test",
+    "test:e2e:ui": "pnpm --filter @dc-platform/e2e test:ui",
+    "test:e2e:report": "pnpm --filter @dc-platform/e2e test:report",
+    "docker:up": "docker compose -f infrastructure/docker-compose.yml up -d --build",
+    "docker:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "docker:logs": "docker compose -f infrastructure/docker-compose.yml logs -f"
   },
   "engines": {
     "node": ">=20.0.0",

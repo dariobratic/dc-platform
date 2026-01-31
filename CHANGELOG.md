@@ -6,6 +6,26 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.29] - 2026-01-31
+
+### Added
+- **Frontend Dockerfiles** — Multi-stage builds (node:20-alpine → nginx:alpine) for shell, admin, and client apps
+  - `apps/shell/Dockerfile` — Shell host with VITE_API_BASE_URL, VITE_KEYCLOAK_URL, VITE_KEYCLOAK_REALM, VITE_KEYCLOAK_CLIENT_ID build args
+  - `apps/admin/Dockerfile` — Admin remote with VITE_API_BASE_URL build arg
+  - `apps/client/Dockerfile` — Client remote with VITE_API_BASE_URL, VITE_KEYCLOAK_URL, VITE_KEYCLOAK_REALM build args
+  - Shared nginx SPA config (`infrastructure/nginx/spa.conf`) with try_files fallback and CORS headers for Module Federation
+  - Root `.dockerignore` optimized for frontend builds
+- **Docker Compose frontend services** — Added shell (port 3000), admin (port 5173), client (port 5174) to `infrastructure/docker-compose.yml` with health checks and depends_on ordering
+- **E2E testing infrastructure** — Playwright setup with Page Object Model, auth fixtures, and 19 auth flow tests
+  - `e2e/` workspace package with Playwright config (chromium, screenshots on failure)
+  - Page Objects: LoginPage, SignupPage, OrganizationPickerPage, DashboardPage
+  - Tests: signup flow, signin flow, signout flow, invalid credentials, protected routes
+  - Auth fixture for reusing authenticated state across tests
+- **Docker convenience scripts** — `docker:up`, `docker:down`, `docker:logs` in root package.json
+- **E2E convenience scripts** — `test:e2e`, `test:e2e:ui`, `test:e2e:report` in root package.json
+
+---
+
 ## [0.28] - 2026-01-30
 
 ### Added

@@ -1,0 +1,45 @@
+# Dependencies (installed fresh in Docker)
+**/node_modules/
+**/.pnpm-store/
+
+# Build artifacts
+**/dist/
+**/bin/
+**/obj/
+
+# Git
+.git/
+.gitignore
+
+# Backend services (not needed for frontend builds)
+services/
+
+# Infrastructure (except nginx config, copied explicitly)
+infrastructure/logs/
+
+# Documentation
+docs/
+
+# E2E tests source (package.json copied for lockfile, source not needed)
+e2e/tests/
+e2e/pages/
+e2e/fixtures/
+e2e/helpers/
+e2e/test-results/
+e2e/playwright-report/
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

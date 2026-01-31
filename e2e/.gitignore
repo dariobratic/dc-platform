@@ -1,0 +1,10 @@
+# Auth state saved by Playwright setup
+.auth/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+blob-report/
+
+# Environment
+.env
