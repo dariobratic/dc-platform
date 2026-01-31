@@ -1,8 +1,8 @@
 import { test, expect } from '../../fixtures'
 
 test.describe('Protected routes', () => {
-  // These tests must run without auth — clear storage state
-  test.use({ storageState: { cookies: [], origins: [] } })
+  // These tests must run without auth — clear storage state and disable sessionStorage injection
+  test.use({ storageState: { cookies: [], origins: [] }, injectAuth: false })
 
   test('unauthenticated user accessing /dashboard is redirected to login', async ({
     page,

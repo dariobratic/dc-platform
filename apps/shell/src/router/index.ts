@@ -1,12 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import { defineComponent } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
-
-const RemoteRouterView = defineComponent({
-  name: 'RemoteRouterView',
-  template: '<router-view />',
-})
+import RemoteRouterView from '@/components/RemoteRouterView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -93,8 +88,10 @@ export async function loadRemoteRoutes(): Promise<void> {
     router.removeRoute('admin-fallback')
     for (const route of adminRoutes) {
       router.addRoute('admin', route)
+      console.log('[Shell] Added admin route:', route.name, route.path)
     }
     console.log('[Shell] Admin remote routes loaded:', adminRoutes.length)
+    console.log('[Shell] All routes after adding admin:', router.getRoutes().map(r => ({ name: r.name, path: r.path })))
   } catch (error) {
     console.warn('[Shell] Failed to load admin remote:', error)
   }

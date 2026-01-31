@@ -6,6 +6,32 @@ Format: `[MAJOR.BUILD] - YYYY-MM-DD`
 
 ---
 
+## [0.36] - 2026-01-31
+
+### Added
+- **E2E test coverage expansion** — 28 new tests across admin, client, and routing (47 total, up from 19)
+  - Admin navigation tests (5): dashboard, organizations, workspaces, roles, audit log page loads
+  - Organization management tests (7): page load, table/empty/error states, detail navigation, overview/edit/workspaces/members tabs
+  - Workspace management tests (7): page load, table states, org filter, detail navigation, overview/members/settings tabs
+  - Client workspace tests (5): workspace cards, detail navigation, overview/members tabs
+  - Direct URL routing tests (3): org detail, admin detail refresh, admin users page
+- **Page objects** — 9 new Playwright page objects: AdminDashboardPage, AdminOrganizationsPage, AdminOrganizationDetailPage, AdminWorkspacesPage, AdminWorkspaceDetailPage, AdminRolesPage, AdminAuditLogPage, ClientDashboardPage, ClientWorkspacePage
+- **`injectAuth` fixture option** — Custom Playwright fixture to control sessionStorage auth injection per test (defaults to true, set false for unauthenticated tests)
+- **`RemoteRouterView.vue` component** — Extracted from inline defineComponent in router to SFC
+
+### Fixed
+- **Module Federation in E2E** — Remotes now build+preview instead of dev mode, fixing remoteEntry.js 404 errors with vite-plugin-federation v1.4.1 + Vite 6
+- **Shell remote config** — Changed to object format with `external`, `format: 'esm'`, `from: 'vite'` for reliable federation
+- **Auth state in E2E** — Auth setup now captures sessionStorage (OIDC tokens) alongside cookies, fixing authenticated test context
+- **Protected route tests** — Added `injectAuth: false` to prevent sessionStorage injection in unauthenticated tests
+- **WorkspaceCard testability** — Added `data-testid="workspace-card"` for E2E selectors
+
+### Changed
+- **Playwright config** — Added webServer entries for admin (build+preview on 5173) and client (build+preview on 5174)
+- **Admin/client vite.config.ts** — Added `base` URL for correct asset paths in preview mode
+
+---
+
 ## [0.35] - 2026-01-31
 
 ### Changed

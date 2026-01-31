@@ -1,6 +1,7 @@
 import { mount, type ComponentMountingOptions } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 import { type Component, defineComponent } from 'vue'
+import { vi } from 'vitest'
 
 const DcSpinner = defineComponent({
   name: 'DcSpinner',

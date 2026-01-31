@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { DcSpinner, DcAlert, DcButton, DcInput, DcModal, DcCard, DcBadge, DcSelect } from '@dc-platform/ui-kit'
 import {
   getOrganization,
@@ -26,7 +26,6 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const route = useRoute()
-const router = useRouter()
 const client = useApiClient()
 
 const orgId = computed(() => route.params.id as string)

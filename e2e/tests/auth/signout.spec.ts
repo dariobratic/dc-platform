@@ -6,7 +6,7 @@ const TEST_PASSWORD = process.env.E2E_USER_PASSWORD ?? 'TestPassword123'
 test.describe('Signout flow', () => {
   // Signout tests must log in first because Playwright storageState
   // only persists cookies + localStorage, but auth tokens live in sessionStorage.
-  test.use({ storageState: { cookies: [], origins: [] } })
+  test.use({ storageState: { cookies: [], origins: [] }, injectAuth: false })
 
   test('logged in user signs out and is redirected to login', async ({
     loginPage,

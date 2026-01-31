@@ -9,8 +9,16 @@ export default defineConfig({
     federation({
       name: 'shell',
       remotes: {
-        admin: 'http://localhost:5173/assets/remoteEntry.js',
-        client: 'http://localhost:5174/assets/remoteEntry.js',
+        admin: {
+          external: 'http://localhost:5173/assets/remoteEntry.js',
+          format: 'esm',
+          from: 'vite',
+        },
+        client: {
+          external: 'http://localhost:5174/assets/remoteEntry.js',
+          format: 'esm',
+          from: 'vite',
+        },
       },
       shared: {
         vue: { singleton: true },

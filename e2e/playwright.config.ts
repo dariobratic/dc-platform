@@ -26,12 +26,29 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'e2e/.auth/user.json',
+        storageState: '.auth/user.json',
       },
       dependencies: ['setup'],
     },
   ],
   webServer: [
+    // Remotes must be built first, then served in preview mode
+    // because @originjs/vite-plugin-federation doesn't serve
+    // remoteEntry.js reliably in Vite 6 dev mode.
+    {
+      command: 'pnpm --filter admin build && pnpm --filter admin preview',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+      cwd: '..',
+      timeout: 120000,
+    },
+    {
+      command: 'pnpm --filter client build && pnpm --filter client preview',
+      url: 'http://localhost:5174',
+      reuseExistingServer: !process.env.CI,
+      cwd: '..',
+      timeout: 120000,
+    },
     {
       command: 'pnpm --filter shell dev',
       url: 'http://localhost:3000',

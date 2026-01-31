@@ -13,6 +13,7 @@ const router = useRouter()
 
 <template>
   <button
+    data-testid="workspace-card"
     class="block w-full text-left bg-white border border-gray-200 rounded-lg p-5 hover:border-indigo-300 hover:shadow-sm transition-all"
     @click="router.push(`/app/workspace/${workspace.id}`)"
   >

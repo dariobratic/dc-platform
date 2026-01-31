@@ -1,6 +1,7 @@
 import { mount, type ComponentMountingOptions } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
-import { type Component, defineComponent, h } from 'vue'
+import { type Component, defineComponent } from 'vue'
+import { vi } from 'vitest'
 
 // Stubs for ui-kit components
 const DcSpinner = defineComponent({

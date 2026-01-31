@@ -4,6 +4,7 @@ import federation from '@originjs/vite-plugin-federation'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
+  base: 'http://localhost:5173/',
   plugins: [
     vue(),
     federation({
